@@ -18,6 +18,15 @@ source/pytest-*.txt
 source/fix.py
 source/fix.js
 source/web/备份-*/
+source/PORTABLE_README.md
+source/design-qa.md
+source/scripts/build_release_with_secret.ps1
+source/scripts/diagnose_secret_presence.py
+source/scripts/embed_deepseek_secret.py
+source/scripts/extract_embedded_secret_blob.py
+source/scripts/online_backup_for_deploy.py
+source/scripts/recover_embedded_deepseek_from_exe.py
+source/scripts/verify_secret_settings_api.py
 _internal/
 ms-playwright/
 webview2-runtime/
