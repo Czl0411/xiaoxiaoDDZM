@@ -49,7 +49,8 @@ def test_release_assembly_copies_runtime_but_never_live_data() -> None:
     script = (SOURCE / "scripts/assemble_windows_release.ps1").read_text(encoding="utf-8")
     assert '"dist\\DZMM群聊机器人"' in script
     assert '"ms-playwright"' in script
-    assert "Compress-Archive" in script
+    assert "tar.exe -a -c -f" in script
+    assert "$LASTEXITCODE -ne 0" in script
     assert "Copy-Item" in script
     assert "data" not in script.lower()
 

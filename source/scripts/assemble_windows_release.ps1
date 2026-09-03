@@ -30,6 +30,9 @@ New-Item -ItemType Directory -Path $releaseRoot -Force | Out-Null
 Copy-Item -LiteralPath $builtApp -Destination $releaseApp -Recurse -Force
 Copy-Item -LiteralPath $browserRoot -Destination (Join-Path $releaseApp "ms-playwright") -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $sourceRoot "发布版使用说明.txt") -Destination $releaseApp -Force
-Compress-Archive -Path $releaseApp -DestinationPath $portableZip -CompressionLevel Optimal
+& tar.exe -a -c -f $portableZip -C $releaseRoot (Split-Path -Leaf $releaseApp)
+if ($LASTEXITCODE -ne 0) {
+    throw "Creating portable ZIP failed with exit code $LASTEXITCODE"
+}
 
 Write-Output "portable_zip=$portableZip"
