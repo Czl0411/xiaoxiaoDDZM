@@ -75,11 +75,19 @@ def make_gateway(socket):
     )
 
 
-def test_default_async_client_honors_proxy_environment():
+def test_default_async_client_uses_operating_system_https_proxy(monkeypatch):
+    monkeypatch.delenv("HTTPS_PROXY", raising=False)
+    monkeypatch.delenv("https_proxy", raising=False)
+    monkeypatch.setattr(
+        "urllib.request.getproxies",
+        lambda: {"https": "http://127.0.0.1:7897"},
+    )
+
     async def run():
         socket = AikdaSocketGateway._new_socket()
         try:
             assert socket.eio.http._trust_env is True
+            assert str(socket.eio.http._default_proxy) == "http://127.0.0.1:7897"
         finally:
             await socket.eio.http.close()
 

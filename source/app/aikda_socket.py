@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import urllib.request
 from collections import deque
 from datetime import UTC, datetime
 from typing import Any, Awaitable, Callable
@@ -61,7 +62,12 @@ class AikdaSocketGateway:
         import aiohttp
         import socketio
 
-        proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy")
+        proxy = (
+            os.environ.get("HTTPS_PROXY")
+            or os.environ.get("https_proxy")
+            or urllib.request.getproxies().get("https")
+            or urllib.request.getproxies().get("http")
+        )
         session = aiohttp.ClientSession(trust_env=True, proxy=proxy)
         return socketio.AsyncClient(reconnection=False, http_session=session)
 
