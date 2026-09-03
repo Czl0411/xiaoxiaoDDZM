@@ -17,6 +17,7 @@ source/*.png
 source/pytest-*.txt
 source/fix.py
 source/fix.js
+source/web/备份-*/
 _internal/
 ms-playwright/
 webview2-runtime/

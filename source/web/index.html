@@ -1,0 +1,1440 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DZMM 群聊机器人控制台</title>
+  <link rel="stylesheet" href="/static/style.css?v=commission-numbering-20260825">
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-gauge" viewBox="0 0 24 24"><path d="M4 13a8 8 0 1 1 16 0"/><path d="M12 13l3-3"/><path d="M6.5 18h11"/></symbol>
+    <symbol id="icon-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></symbol>
+    <symbol id="icon-command" viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="m9 9 3 3-3 3M13 15h3"/></symbol>
+    <symbol id="icon-gift" viewBox="0 0 24 24"><path d="M3 9h18v4H3zM5 13v7h14v-7M12 9v11"/><path d="M7.5 9a2.5 2.5 0 1 1 2.5-2.5V9M16.5 9A2.5 2.5 0 1 0 14 6.5V9"/></symbol>
+    <symbol id="icon-game" viewBox="0 0 24 24"><path d="M7 8h10a4 4 0 0 1 3.8 5.2l-1.2 4a2 2 0 0 1-3.3.8L14 16H10l-2.3 2a2 2 0 0 1-3.3-.8l-1.2-4A4 4 0 0 1 7 8Z"/><path d="M8 11v4M6 13h4M15 12h.01M18 14h.01"/></symbol>
+    <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 3 1.4 5.6L19 10l-5.6 1.4L12 17l-1.4-5.6L5 10l5.6-1.4L12 3ZM19 16l.6 2.4L22 19l-2.4.6L19 22l-.6-2.4L16 19l2.4-.6L19 16Z"/></symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="m16 8 4-4M20 4h-4M20 4v4"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-3Z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="icon-warehouse" viewBox="0 0 24 24"><path d="m3 10 9-6 9 6v10H3V10Z"/><path d="M7 20v-6h10v6M7 10h10"/></symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M17 14a5 5 0 0 1 4 6"/></symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5Z"/><path d="M8 9h8M8 12h5"/></symbol>
+    <symbol id="icon-terminal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24"><path d="m12 3 9 17H3L12 3Z"/><path d="M12 9v5M12 17h.01"/></symbol>
+    <symbol id="icon-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.3 2.3 0 1 1 3.8 1.7c-1 .7-1.6 1.1-1.6 2.3M12 16h.01"/></symbol>
+    <symbol id="icon-collapse" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v16M14 10l-2 2 2 2"/></symbol>
+    <symbol id="icon-expand" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v16M12 10l2 2-2 2"/></symbol>
+  </svg>
+  <aside class="sidebar">
+    <div class="brand"><div><strong><span class="brand-long">DZMM CONTROL</span><span class="brand-short">DZ</span></strong><small>群聊机器人管理系统</small></div></div>
+    <nav class="sidebar-nav" aria-label="主导航">
+      <div class="nav-group"><div class="nav-group-title">运行与连接</div>
+        <button data-page="dashboard" class="active" title="仪表盘"><svg class="nav-icon"><use href="#icon-gauge"></use></svg><span>仪表盘</span></button>
+        <button data-page="connect" title="连接设置"><svg class="nav-icon"><use href="#icon-link"></use></svg><span>连接设置</span></button>
+      </div>
+      <div class="nav-group"><div class="nav-group-title">命令与互动</div>
+        <button data-page="commands" title="命令管理"><svg class="nav-icon"><use href="#icon-command"></use></svg><span>命令管理</span></button>
+        <button data-page="lucky-bags" title="福袋系统"><svg class="nav-icon"><use href="#icon-gift"></use></svg><span>福袋系统</span></button>
+        <button data-page="paid-interaction" title="付费互动"><svg class="nav-icon"><use href="#icon-spark"></use></svg><span>付费互动</span></button>
+      </div>
+      <div class="nav-group"><div class="nav-group-title">游戏与玩法</div>
+        <button data-page="games" title="游戏命令"><svg class="nav-icon"><use href="#icon-game"></use></svg><span>游戏命令</span></button>
+        <button data-page="fortune" title="塔罗牌"><svg class="nav-icon"><use href="#icon-sun"></use></svg><span>塔罗牌</span></button>
+        <button data-page="rp" title="RP结界"><svg class="nav-icon"><use href="#icon-target"></use></svg><span>RP结界</span></button>
+        <button data-page="random-events" title="随机事件"><svg class="nav-icon"><use href="#icon-spark"></use></svg><span>随机事件</span></button>
+        <button data-page="image-generation" title="图片生成"><svg class="nav-icon"><use href="#icon-sun"></use></svg><span>图片生成</span></button>
+      </div>
+      <div class="nav-group"><div class="nav-group-title">经济与物品</div>
+        <button data-page="shop" title="神殿仓库"><svg class="nav-icon"><use href="#icon-warehouse"></use></svg><span>神殿仓库</span></button>
+        <button data-page="bounties" title="群友委托所"><svg class="nav-icon"><use href="#icon-users"></use></svg><span>群友委托所</span></button>
+      </div>
+      <div class="nav-group"><div class="nav-group-title">用户与运营</div>
+        <button data-page="ai-character" title="AI角色"><svg class="nav-icon"><use href="#icon-spark"></use></svg><span>AI角色</span></button>
+        <button data-page="users" title="用户数据"><svg class="nav-icon"><use href="#icon-users"></use></svg><span>用户数据</span></button>
+      </div>
+      <div class="nav-group"><div class="nav-group-title">监控与安全</div>
+        <button data-page="messages" title="消息监控"><svg class="nav-icon"><use href="#icon-message"></use></svg><span>消息监控</span></button>
+        <button data-page="logs" title="日志中心"><svg class="nav-icon"><use href="#icon-terminal"></use></svg><span>日志中心</span></button>
+        <button data-page="safety" title="安全设置"><svg class="nav-icon"><use href="#icon-alert"></use></svg><span>安全设置</span></button>
+      </div>
+      <div class="nav-group"><div class="nav-group-title">系统与帮助</div>
+        <button data-page="help" title="使用帮助"><svg class="nav-icon"><use href="#icon-help"></use></svg><span>使用帮助</span></button>
+      </div>
+    </nav>
+    <button id="sidebarCollapse" class="sidebar-collapse" type="button" aria-label="收起导航" title="收起导航"><svg class="nav-icon"><use href="#icon-collapse"></use></svg><span>收起导航</span></button>
+    <div class="sidebar-footer">
+      <span>运行环境</span>
+      <strong id="sidebarServiceStatus">本地服务在线</strong>
+      <small>DZMM Bot</small>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-page">
+        <span class="topbar-kicker">DZMM 群聊机器人</span>
+        <strong id="currentPageTitle">仪表盘</strong>
+      </div>
+      <div class="topbar-statuses" aria-live="polite">
+        <div class="topbar-status bot"><span id="topbarStatusDot"></span><strong id="topbarBotStatus">正在读取状态</strong></div>
+        <div class="topbar-status"><span id="topbarBrowserDot"></span><strong id="topbarBrowserStatus">浏览器读取中</strong></div>
+        <div class="topbar-status"><span id="topbarLoginDot"></span><strong id="topbarLoginStatus">登录读取中</strong></div>
+        <div class="topbar-status topbar-group-status"><span id="topbarGroupDot"></span><strong id="topbarGroupStatus">主群读取中</strong></div>
+      </div>
+    </div>
+    <section id="dashboard" class="page active">
+      <div class="hero">
+        <div>
+          <p class="eyebrow">机器人状态</p>
+          <h1>运行总览</h1>
+          <p>当前只处理 <b>/</b> 开头的群聊命令</p>
+        </div>
+        <div class="hero-actions">
+          <button id="forceRefreshBtn" type="button">刷新界面</button>
+          <button id="pauseBtn">暂停</button>
+          <button id="resumeBtn" class="primary">恢复机器人</button>
+          <button id="stopBtn" class="danger">停止</button>
+          <button id="readBtn">测试读取</button>
+        </div>
+      </div>
+      <div class="grid metrics" id="statusCards"></div>
+      <section class="panel dashboard-log-panel">
+        <div class="section-title"><h2>最近日志</h2><button id="refreshDash">刷新</button></div>
+        <div id="recentLogs" class="list empty">暂无日志。</div>
+      </section>
+      <section class="dashboard-tools" aria-labelledby="dashboardToolsTitle">
+        <div class="dashboard-tools-heading">
+          <div><p class="eyebrow">按需展开</p><h2 id="dashboardToolsTitle">管理工具</h2></div>
+          <p>日常无需调整的功能保持收起，配置和操作内容完整保留。</p>
+        </div>
+        <details class="panel form settings-disclosure dashboard-tool-card">
+          <summary><span>浏览器导航保护</span><small>自动锁定主群与悬赏群页面</small></summary>
+          <div class="section-title">
+            <div><p class="eyebrow">浏览器导航保护</p><h2>自动锁定群聊地址</h2></div>
+            <button id="saveGroupUrlLock" class="primary" type="button">保存开关</button>
+          </div>
+          <label class="switch"><input id="groupUrlLockEnabled" type="checkbox"> 开启后自动保持在主群和悬赏群页面</label>
+          <p class="note">默认关闭。新电脑请先保持关闭并完成 DZMM 登录；确认登录成功后再开启。关闭时，状态检测和消息轮询不会把登录页强制刷新回群聊。</p>
+          <div id="groupUrlLockResult" class="notice">当前未开启，登录页面不会被自动抢走。</div>
+        </details>
+        <details class="panel form dashboard-tool-card dashboard-quick-test">
+          <summary><span>快速测试</span><small>向当前群聊发送真实测试消息</small></summary>
+          <div class="quick-test-panel">
+            <div class="quick-test-copy">
+              <h2>快速测试</h2>
+              <p class="note">该操作将向真实群聊发送消息；自动回复需先恢复机器人。</p>
+            </div>
+            <label class="quick-test-field">发送测试消息到 DZMM<input id="quickSendText" value="/测试"></label>
+            <button id="sendBtn" class="primary">发送测试消息</button>
+          </div>
+        </details>
+      <details class="panel form settings-disclosure dashboard-tool-card">
+        <summary><span>完整数据导出</span><small>迁移与留档</small></summary>
+        <div class="section-title">
+          <div><p class="eyebrow">迁移与留档</p><h2>完整数据导出</h2></div>
+          <button id="exportFullData" class="primary" type="button">导出 ZIP</button>
+        </div>
+        <p class="note">包含全部系统命令、自定义命令、设置、用户和业务数据；聊天、回复、命令命中及日志导出昨天 00:00 至点击导出时的记录。</p>
+        <div id="exportDataResult" class="notice">尚未导出。</div>
+      </details>
+        <details class="panel form settings-disclosure dashboard-tool-card dashboard-tool-newcomer">
+          <summary><span>新人福利</span><small>领取概况与首次发言奖励</small></summary>
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">首次身份福利</p>
+            <h2>发放概览</h2>
+          </div>
+          <button id="refreshNewcomerBenefit" type="button">刷新数据</button>
+        </div>
+        <div class="newcomer-stats" aria-label="新人福利统计">
+          <article><span>已经领取</span><strong id="newcomerRecipientCount">0 人</strong></article>
+          <article><span>累计发放</span><strong id="newcomerTotalAmount">0 功德点</strong></article>
+          <article><span>最近发放</span><strong id="newcomerLastGranted">暂无</strong></article>
+        </div>
+        <div class="two">
+          <label class="switch"><input id="newcomerBenefitEnabled" type="checkbox" checked> 启用新人首次发言福利</label>
+          <label>每人发放数量<input id="newcomerBenefitAmount" type="number" min="1" max="100000" value="60"></label>
+        </div>
+        <p class="note">只在第一次收到一个全新平台唯一 ID 的消息时发放；旧用户、昵称变化和重复消息都不会再次领取。</p>
+        <div class="toolbar"><button id="saveNewcomerBenefit" class="primary" type="button">保存新人福利设置</button></div>
+        <div id="newcomerBenefitRecent" class="table">暂无领取记录。</div>
+      </details>
+      <details class="panel form settings-disclosure dashboard-tool-card">
+        <summary><span>工资发放</span><small>活跃名单与昵称工资规则</small></summary>
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">手动领取</p>
+            <h2>工资发放</h2>
+          </div>
+          <button id="refreshFacilityWages" type="button">刷新名单</button>
+        </div>
+        <div id="facilityWageCommand" class="notice">领取命令：/领取工资</div>
+        <div id="facilityWageSummary" class="notice">正在检索昨天的活跃用户……</div>
+        <p class="note">系统不会自动发放工资。用户需要在当天发送上方命令，手动领取昨天的工资；昨天 00:00 至 24:00 出现过的全部发言昵称都必须符合对应规则，只要某条规则全日持续符合就可以领取。多条规则同时符合时会叠加发放，并在机器人回复中逐条说明。</p>
+        <div class="three">
+          <label>昵称包含文案<input id="newFacilityWageKeyword" maxlength="100" value="公共设施" placeholder="例如：公共设施"></label>
+          <label>每日工资<input id="newFacilityWageAmount" type="number" min="1" max="100000" value="10"></label>
+          <label>排序<input id="newFacilityWageSort" type="number" value="0"></label>
+        </div>
+        <div class="toolbar">
+          <button id="addFacilityWageRule" class="primary" type="button">新增工资规则</button>
+        </div>
+        <div id="facilityWageRules" class="table">暂无工资规则。</div>
+      </details>
+      <details class="panel form settings-disclosure dashboard-tool-card">
+        <summary><span>全员功德点补偿</span><small>高风险批量发放工具</small></summary>
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">全员补偿</p>
+            <h2>全员功德点补偿</h2>
+          </div>
+          <button id="refreshCompensationPreview" type="button">重新核对人数</button>
+        </div>
+        <div id="compensationPreview" class="notice">正在核对用户记录……</div>
+        <div class="two">
+          <label>每人发放数量<span>正常、待校准、身份冲突用户都会收到。</span><input id="compensationAmount" type="number" min="1" max="100000" value="100"></label>
+          <label>补偿原因<span>会写入每个人的功德点流水。</span><input id="compensationReason" maxlength="200" value="系统更新期间部分功能暂时不可用"></label>
+        </div>
+        <label>群通知消息<span>可用变量：{amount} 数量、{currency} 名称、{count} 总人数、{total} 总点数、{normal_count} 正常人数、{pending_count} 待校准人数、{conflict_count} 冲突人数、{reason} 原因、{batch} 批次号。</span><textarea id="compensationNotification" maxlength="2000" rows="5"></textarea></label>
+        <div class="toolbar">
+          <button id="grantCompensationBtn" class="danger" type="button">向全部用户发放补偿</button>
+        </div>
+        <div id="compensationResult" class="notice">尚未发放。本功能按用户记录主键逐人入账，不会因缺少 UUID 或身份冲突而漏发。</div>
+      </details>
+      </section>
+    </section>
+
+    <section id="connect" class="page">
+      <header><p class="eyebrow">连接管理</p><h1>连接设置</h1><p>地址、登录、浏览器与 AI 服务连接</p></header>
+      <details class="panel form settings-disclosure">
+        <summary><span>连接参数</span><small>群聊地址、扫描间隔与启动选项</small></summary>
+        <label>DZMM 首页地址<span>首次使用点击“打开 DZMM”，在机器人浏览器里登录。</span><input id="homeUrl"></label>
+        <label>主群聊天 URL<span>机器人会在主群处理原有命令，也允许发布悬赏。</span><input id="groupUrl" type="password" autocomplete="off"></label>
+        <label>悬赏群聊天 URL<span>机器人使用独立标签页监听；这里只处理悬赏命令。</span><input id="bountyGroupUrl" type="password" autocomplete="off"></label>
+        <label>绘图群聊天 URL<span>独立第三群；这里只处理图片生成命令，不处理主群或悬赏功能。</span><input id="imageGroupUrl" type="password" autocomplete="off"></label>
+        <div class="two">
+          <label>扫描间隔（秒）<span>建议 2-5 秒。</span><input id="scanInterval" type="number" min="1" step="1"></label>
+          <label>发送延迟（秒）<span>连续消息之间的等待时间。</span><input id="sendDelay" type="number" min="0.5" step="0.5"></label>
+        </div>
+        <div class="checks">
+          <label><input id="botEnabled" type="checkbox"> 启用机器人</label>
+          <label><input id="autoOpenManager" type="checkbox"> 启动后自动打开管理页</label>
+          <label><input id="requireSlash" type="checkbox" checked disabled> 固定只处理 `/` 命令</label>
+        </div>
+        <label>未知命令回复<span>`/xxx` 没有命中内置功能或自定义命令时发送。</span><input id="unknownCommandReply"></label>
+      </details>
+      <div class="connection-action-groups">
+        <div class="connection-action-group">
+          <span>地址与页面</span>
+          <div>
+            <button id="toggleConnectionUrls" type="button">显示地址</button>
+            <button id="openHome">打开 DZMM</button>
+            <button id="openGroup">打开主群</button>
+            <button id="openBountyGroup">打开悬赏群</button>
+            <button id="openImageGroup">打开绘图群</button>
+          </div>
+        </div>
+        <div class="connection-action-group">
+          <span>检查与诊断</span>
+          <div>
+            <button id="checkLogin">检测登录</button>
+            <button id="detectSelectors">识别页面</button>
+            <button id="debugPage">页面调试</button>
+          </div>
+        </div>
+        <div class="connection-action-group connection-action-group-end">
+          <span>保存与恢复</span>
+          <div>
+            <button id="resetProfile" class="danger">重置登录</button>
+            <button id="saveSettings" class="primary">保存设置</button>
+          </div>
+        </div>
+      </div>
+      <div id="actionResult" class="notice">等待操作。</div>
+      <section class="panel connection-overview" aria-labelledby="connectionOverviewTitle">
+        <div class="section-title">
+          <div><p class="eyebrow">实时状态</p><h2 id="connectionOverviewTitle">连接概览</h2></div>
+          <span class="connection-overview-note">状态来自当前本地服务</span>
+        </div>
+        <div class="connection-status-grid">
+          <article class="connection-status-card" data-state="muted"><svg aria-hidden="true"><use href="#icon-link"></use></svg><div><span>浏览器环境</span><strong id="connectionBrowserStatus">读取中</strong><small id="connectionBrowserDetail">等待状态检测</small></div></article>
+          <article class="connection-status-card" data-state="muted"><svg aria-hidden="true"><use href="#icon-users"></use></svg><div><span>账号登录</span><strong id="connectionLoginStatus">读取中</strong><small id="connectionLoginDetail">等待状态检测</small></div></article>
+          <article class="connection-status-card" data-state="muted"><svg aria-hidden="true"><use href="#icon-message"></use></svg><div><span>主群地址</span><strong id="connectionGroupStatus">读取中</strong><small id="connectionGroupDetail">等待状态检测</small></div></article>
+          <article class="connection-status-card" data-state="muted"><svg aria-hidden="true"><use href="#icon-target"></use></svg><div><span>悬赏群地址</span><strong id="connectionBountyStatus">读取中</strong><small id="connectionBountyDetail">等待状态检测</small></div></article>
+          <article class="connection-status-card" data-state="muted"><svg aria-hidden="true"><use href="#icon-sun"></use></svg><div><span>绘图群地址</span><strong id="connectionImageStatus">读取中</strong><small id="connectionImageDetail">等待状态检测</small></div></article>
+          <article class="connection-status-card" data-state="muted"><svg aria-hidden="true"><use href="#icon-spark"></use></svg><div><span>付费互动 · DeepSeek</span><strong id="connectionPaidAiStatus">读取中</strong><small id="connectionPaidAiDetail">等待设置读取</small></div></article>
+          <article class="connection-status-card" data-state="muted"><svg aria-hidden="true"><use href="#icon-sun"></use></svg><div><span>塔罗牌 · DeepSeek</span><strong id="connectionFortuneAiStatus">读取中</strong><small id="connectionFortuneAiDetail">等待设置读取</small></div></article>
+        </div>
+      </section>
+      <details class="panel form settings-disclosure connection-disclosure">
+        <summary><span>付费互动 · DeepSeek 连接</span><small>密钥状态、模型与连通性测试</small></summary>
+        <div class="section-title"><div><p class="eyebrow">AI 连接</p><h2>DeepSeek 设置</h2></div><span id="paidAiKeyStatus" class="badge">正在检查密钥</span></div>
+        <div class="checks"><label><input id="paidAiEnabled" type="checkbox"> 启用 AI 付费互动</label></div>
+        <div class="three">
+          <label>API 地址<span>官方默认：https://api.deepseek.com</span><input id="paidAiBaseUrl"></label>
+          <label>模型选择<span>Flash 与 Pro 均强制关闭思考模式</span><select id="paidAiModel"><option value="deepseek-v4-flash">DeepSeek V4 Flash</option><option value="deepseek-v4-pro">DeepSeek V4 Pro</option></select></label>
+          <label>AI 超时秒数<span>连接请求最长等待时间</span><input id="paidAiTimeout" type="number" min="3" max="120"></label>
+          <label>DeepSeek API 密钥<span>输入新密钥即可替换；留空不修改</span><input id="paidAiKey" type="password" autocomplete="new-password" placeholder="sk-..."></label>
+        </div>
+        <div class="notice">新密钥保存在独立密钥文件中，界面只显示末4位。恢复内置密钥会删除手动替换值，改用 EXE 内的备用密钥。</div>
+        <div class="toolbar"><button id="testPaidAi" type="button">保存并测试 DeepSeek</button><button id="restoreEmbeddedDeepseekKey" type="button">恢复内置密钥</button></div>
+        <div id="paidAiTestResult" class="notice">可测试当前所选模型的连接状态。</div>
+      </details>
+      <details class="panel form settings-disclosure connection-disclosure">
+        <summary><span>图片生成 · Image2 API 连接</span><small>独立密钥、模型与真实生成测试</small></summary>
+        <div class="section-title"><div><p class="eyebrow">绘图连接</p><h2>Image2 / gpt-image-2</h2></div><span id="imageApiKeyStatus" class="badge">正在检查密钥</span></div>
+        <div class="three">
+          <label>API 地址<input id="imageApiBaseConnection" placeholder="https://api.example.com/v1"></label>
+          <label>模型<input id="imageApiModelConnection" value="gpt-image-2"></label>
+          <label>API 密钥<span>留空表示不修改现有密钥</span><input id="imageApiKeyConnection" type="password" autocomplete="new-password"></label>
+        </div>
+        <div class="toolbar connection-section-actions"><button id="saveImageApiConnection" class="primary" type="button">保存/替换图片API密钥</button><button id="clearImageApiKeyConnection" type="button">清除图片API密钥</button><button id="testImageApiConnection" type="button">真实生成测试</button><button type="button" onclick="showPage('image-generation')">查看完整图片生成设置</button></div>
+        <div id="imageApiConnectionResult" class="notice">测试会真实调用一次图片API，但不会扣除群友功德，也不会写入生成历史。</div>
+      </details>
+      <details class="panel form settings-disclosure connection-disclosure">
+        <summary><span>付费互动 · AI 提示词</span><small>系统、对话与输出限制</small></summary>
+        <div class="connection-config-heading">
+          <div><p class="eyebrow">独立写作规则</p><h2>付费互动提示词</h2></div>
+          <span class="connection-config-note">按需展开对应编辑区</span>
+        </div>
+        <div class="connection-subsection-stack">
+          <details class="connection-subsection">
+            <summary><span>系统提示词</span><small>世界观、语气和安全要求</small></summary>
+            <div class="connection-subsection-body">
+              <label>系统提示词<span>用于统一规定世界观、语气、篇幅、输出方式和安全要求。</span><textarea id="paidAiSystemPrompt" rows="8"></textarea></label>
+            </div>
+          </details>
+          <details class="connection-subsection">
+            <summary><span>对话提示词</span><small>变量和互动回复模板</small></summary>
+            <div class="connection-subsection-body">
+              <label>对话提示词<span>可用：{user} {user_gender} {target} {target_gender} {action} {amount} {currency} {balance} {target_balance} {newline}</span><textarea id="paidAiUserPrompt" rows="8"></textarea></label>
+            </div>
+          </details>
+          <details class="connection-subsection">
+            <summary><span>输出限制</span><small>创意程度、Token 与字符数</small></summary>
+            <div class="connection-subsection-body">
+              <div class="three">
+                <label>创意程度<span>0 至 2</span><input id="paidAiTemperature" type="number" min="0" max="2" step="0.1"></label>
+                <label>最大生成 Token<input id="paidAiMaxTokens" type="number" min="32" max="4096"></label>
+                <label>最终回复最大字符<input id="paidAiMaxOutputChars" type="number" min="80" max="4000"></label>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div class="toolbar connection-section-actions"><button id="savePaidInteractionConnection" class="primary" type="button">保存付费互动提示词</button><button type="button" onclick="showPage('paid-interaction')">查看互动规则</button></div>
+        <div id="paidConnectionSaveResult" class="notice">提示词尚未修改。</div>
+      </details>
+      <details class="panel form settings-disclosure connection-disclosure">
+        <summary><span>塔罗牌 · 连接与规则</span><small>费用、模型与输出限制</small></summary>
+        <div class="connection-config-heading">
+          <div><p class="eyebrow">固定规则</p><h2>塔罗牌占卜连接</h2></div>
+          <span id="fortuneAiKeyStatus" class="badge">正在检查内置密钥</span>
+        </div>
+        <div class="connection-subsection-stack">
+          <details class="connection-subsection">
+            <summary><span>使用规则</span><small>命令、启用状态与次数</small></summary>
+            <div class="connection-subsection-body">
+              <div class="notice connection-rule-note">唯一命令：<code>/塔罗牌：事业</code>。支持中英文冒号或空格，主题为 1～40 个字。先发牌面图片，再发抽牌文案，最后由大祭司魔法追追调用 AI 解牌；图片或 AI 失败均不扣费、不占次数。每日次数请在“安全设置”中修改。</div>
+              <div class="checks"><label><input id="fortuneEnabled" type="checkbox"> 启用塔罗牌占卜</label></div>
+              <label>占卜师身份<span>系统提示词、抽牌文案和最终回复可使用 {reader}</span><input id="fortuneReaderName" maxlength="40"></label>
+              <label>每次消耗功德<span>1～100000 的整数</span><input id="fortuneCost" type="number" min="1" max="100000" step="1"></label>
+            </div>
+          </details>
+          <details class="connection-subsection">
+            <summary><span>DeepSeek 连接</span><small>地址、模型与超时时间</small></summary>
+            <div class="connection-subsection-body">
+              <div class="three">
+                <label>API 地址<span>与付费互动相互独立保存</span><input id="fortuneAiBaseUrl"></label>
+                <label>模型选择<select id="fortuneAiModel"><option value="deepseek-v4-flash">DeepSeek V4 Flash</option><option value="deepseek-v4-pro">DeepSeek V4 Pro</option></select></label>
+                <label>AI 超时秒数<input id="fortuneAiTimeout" type="number" min="3" max="120"></label>
+              </div>
+            </div>
+          </details>
+          <details class="connection-subsection">
+            <summary><span>输出限制</span><small>创意程度、Token 与字符数</small></summary>
+            <div class="connection-subsection-body">
+              <div class="three">
+                <label>创意程度<input id="fortuneAiTemperature" type="number" min="0" max="2" step="0.05"></label>
+                <label>最大生成 Token<input id="fortuneAiMaxTokens" type="number" min="32" max="4096"></label>
+                <label>AI 正文最大字符<span>最终硬限制为1000字</span><input id="fortuneAiMaxOutputChars" type="number" min="80" max="1000"></label>
+              </div>
+            </div>
+          </details>
+        </div>
+      </details>
+      <details class="panel form settings-disclosure connection-disclosure">
+        <summary><span>塔罗牌 · AI 提示词</span><small>系统、对话与格式整理</small></summary>
+        <div class="section-title"><div><p class="eyebrow">独立写作规则</p><h2>塔罗牌专用 AI 提示词</h2></div></div>
+        <div class="notice">这里的提示词只供塔罗牌占卜使用，不会读取或修改付费互动提示词。程序会把正文压缩到1000字以内并尽量减少换行。</div>
+        <label>塔罗牌系统提示词<span>可用：{reader}</span><textarea id="fortuneAiSystemPrompt" rows="12"></textarea></label>
+        <label>塔罗牌对话提示词<span>可用：{reader} {user} {topic} {date} {card_name} {card_character} {orientation} {cost} {currency} {newline}</span><textarea id="fortuneAiUserPrompt" rows="7"></textarea></label>
+        <label>格式整理提示词<span>可用：{reader} {topic} {card_name} {card_character} {orientation} {original} {newline}</span><textarea id="fortuneAiRepairPrompt" rows="8"></textarea></label>
+        <div class="toolbar connection-section-actions"><button id="saveFortuneSettingsConnection" class="primary" type="button">保存塔罗牌连接设置</button><button type="button" onclick="showPage('fortune')">查看完整塔罗牌设置</button></div>
+        <div id="fortuneConnectionSaveResult" class="notice">提示词尚未修改。</div>
+      </details>
+      <pre id="settingsResult"></pre>
+    </section>
+
+    <section id="commands" class="page">
+      <header><p class="eyebrow">命令中心</p><h1>命令管理</h1><p>查找和编辑机器人命令</p></header>
+
+      <details class="system-command-section">
+        <summary class="system-command-summary"><div><h2>系统命令</h2><small>按主题集中管理内置命令、触发词和回复模板</small></div><span>点击展开</span></summary>
+        <div id="sysCmdList" class="system-command-grid"></div>
+      </details>
+
+      <div class="section-title" style="margin-top:24px"><h2>自定义命令</h2></div>
+      <div class="toolbar command-toolbar">
+        <input id="ruleSearch" placeholder="搜索命令">
+        <select id="ruleGroupFilter"><option value="all">全部分组</option></select>
+        <button id="newRule" class="primary">新建命令</button>
+        <button id="manageGroups">管理分组</button>
+        <button id="exportRules">导出</button>
+        <button id="importRules">导入</button>
+      </div>
+      <div id="ruleList" class="command-list empty">还没有自定义命令。</div>
+    </section>
+
+    <section id="lucky-bags" class="page">
+      <header><p class="eyebrow">功德流动</p><h1>福袋系统</h1><p>福袋记录与命令设置</p></header>
+      <div id="luckyBagCommandList" class="system-command-grid"></div>
+      <section class="panel form" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">发放记录</p><h2>最近福袋</h2></div><button id="refreshLuckyBags" type="button">刷新</button></div>
+        <div id="luckyBagSummary" class="notice">正在读取福袋记录……</div>
+        <div id="luckyBagHistory" class="table">暂无福袋记录。</div>
+      </section>
+    </section>
+
+    <section id="games" class="page">
+      <header><p class="eyebrow">互动玩法</p><h1>游戏命令</h1><p>群聊小游戏与群对战</p></header>
+      <div id="gameList" class="game-card-grid"></div>
+    </section>
+
+    <section id="paid-interaction" class="page">
+      <header><p class="eyebrow">DeepSeek 动态叙事</p><h1>付费互动</h1><p>AI 互动、费用与回复模板</p></header>
+      <div class="page-link-notice"><span>DeepSeek 连接状态与提示词已集中到连接设置。</span><button type="button" onclick="showPage('connect')">前往连接设置</button></div>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>互动规则</span><small>命令、费用与结算限制</small></summary>
+        <div class="section-title"><div><p class="eyebrow">命令与结算</p><h2>互动规则</h2></div></div>
+        <div class="notice">固定格式：<code>/对目标昵称或自定义称呼发起互动：具体事情</code>，中文冒号和英文冒号都支持。</div>
+        <div class="two">
+          <label>开启接受命令<input id="paidEnableCommands"></label>
+          <label>关闭接受命令<input id="paidDisableCommands"></label>
+        </div>
+        <div class="four">
+          <label>每次支付功德点<span>最低 10，结算时固定产生 10 点正常损耗。</span><input id="paidAmount" type="number" min="10" max="100000"></label>
+          <label>发起者最低余额<input id="paidMinBalance" type="number" min="-1000000" max="0"></label>
+          <label>事件最大字符数<input id="paidMaxActionChars" type="number" min="20" max="2000"></label>
+        </div>
+      </details>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>回复与保存</span><small>失败文案、结算尾注与保存</small></summary>
+        <div class="section-title"><div><p class="eyebrow">反馈文案</p><h2>回复与失败处理</h2></div></div>
+        <label>结算尾注<span>可用：{user} {target} {amount} {loss_amount} {received_amount} {currency} {balance} {target_balance} {action} {newline}</span><textarea id="paidSettlementFooter" rows="3"></textarea></label>
+        <div class="two">
+          <label>AI未启用回复<textarea id="paidAiDisabledReply" rows="3"></textarea></label>
+          <label>API密钥未配置回复<textarea id="paidAiNotConfiguredReply" rows="3"></textarea></label>
+          <label>AI失败回复<textarea id="paidAiErrorReply" rows="3"></textarea></label>
+          <label>事件过长回复<textarea id="paidActionTooLongReply" rows="3"></textarea></label>
+          <label>开启接受成功回复<textarea id="paidEnabledReply" rows="3"></textarea></label>
+          <label>关闭接受成功回复<textarea id="paidDisabledReply" rows="3"></textarea></label>
+          <label>目标未开启回复<textarea id="paidTargetDisabledReply" rows="3"></textarea></label>
+          <label>命令格式提示<textarea id="paidUsageReply" rows="3"></textarea></label>
+          <label>目标不存在回复<textarea id="paidTargetNotFoundReply" rows="3"></textarea></label>
+          <label>身份未确认回复<textarea id="paidIdentityInvalidReply" rows="3"></textarea></label>
+          <label>不能对自己使用回复<textarea id="paidSelfReply" rows="3"></textarea></label>
+          <label>余额不足回复<textarea id="paidLimitReply" rows="3"></textarea></label>
+        </div>
+        <div class="toolbar"><button id="savePaidInteraction" class="primary" type="button">保存付费互动设置</button></div>
+        <div id="paidSaveResult" class="notice">尚未修改。</div>
+      </details>
+    </section>
+
+    <section id="fortune" class="page">
+      <header><p class="eyebrow">牌阵占卜</p><h1>塔罗牌</h1><p>抽牌规则、AI 文案与占卜记录</p></header>
+      <div class="page-link-notice"><span>塔罗牌连接状态与提示词已集中到连接设置，其他占卜规则仍在本页。</span><button type="button" onclick="showPage('connect')">前往连接设置</button></div>
+
+      <div class="grid cards">
+        <article class="card"><div class="label">今日占卜</div><div id="fortuneTodayCount" class="value">0 人</div></article>
+        <article class="card"><div class="label">累计占卜</div><div id="fortuneTotalCount" class="value">0 次</div></article>
+        <article class="card"><div class="label">累计消耗</div><div id="fortuneTotalCost" class="value">0 功德点</div></article>
+      </div>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>回复与保存</span><small>异常文案、结算尾注与保存</small></summary>
+        <div class="section-title"><div><p class="eyebrow">异常与结算</p><h2>回复文案</h2></div></div>
+        <div class="two">
+          <label>抽牌后的等待文案<span>可用：{user} {topic} {card_name} {card_character} {orientation} {newline}</span><textarea id="fortuneDrawReply" rows="4"></textarea></label>
+          <label>命令格式错误回复<textarea id="fortuneUsageReply" rows="3"></textarea></label>
+          <label>主题超过40字回复<textarea id="fortuneTopicTooLongReply" rows="3"></textarea></label>
+          <label>功能关闭回复<textarea id="fortuneDisabledReply" rows="3"></textarea></label>
+          <label>唯一 ID 未确认回复<textarea id="fortuneIdentityInvalidReply" rows="3"></textarea></label>
+          <label>今日已经占卜回复<textarea id="fortuneAlreadyReply" rows="3"></textarea></label>
+          <label>余额不足回复<textarea id="fortuneNoMoneyReply" rows="3"></textarea></label>
+          <label>API 密钥未配置回复<textarea id="fortuneAiNotConfiguredReply" rows="3"></textarea></label>
+          <label>图片发送失败回复<textarea id="fortuneImageErrorReply" rows="3"></textarea></label>
+          <label>AI 失败回复<textarea id="fortuneAiErrorReply" rows="3"></textarea></label>
+          <label>格式修复失败回复<textarea id="fortuneFormatErrorReply" rows="3"></textarea></label>
+          <label>成功结算行内尾注<span>会追加到最后一行，请不要填写换行</span><textarea id="fortuneSettlementFooter" rows="3"></textarea></label>
+        </div>
+        <div class="toolbar"><button id="saveFortuneSettings" class="primary" type="button">保存塔罗牌设置</button><button id="refreshFortuneStats" type="button">刷新记录</button></div>
+        <div id="fortuneSaveResult" class="notice">尚未修改。</div>
+      </details>
+
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">成功记录</p><h2>最近占卜</h2></div></div>
+        <div id="fortuneHistory" class="table">暂无占卜记录。</div>
+      </div>
+    </section>
+
+    <section id="bounties" class="page">
+      <header><p class="eyebrow">需求与服务双向交易</p><h1>群友委托所</h1><p>需求是发任务并支付奖励，服务是持续上架出售；两套业务独立管理，历史数据完整保留</p></header>
+
+      <div class="grid cards">
+        <article class="card"><div class="label">开放需求</div><div id="bountyWaitingCount" class="value">0 条</div></article>
+        <article class="card"><div class="label">在售服务</div><div id="bountyActiveCount" class="value">0 条</div></article>
+        <article class="card"><div class="label">进行中订单</div><div id="bountyBanCount" class="value">0 单</div></article>
+        <article class="card"><div class="label">订单托管</div><div id="bountyLockedReward" class="value">0 功德</div></article>
+      </div>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>双群地址</span><small>主群、悬赏群与邀请链接</small></summary>
+        <div class="section-title"><div><p class="eyebrow">群聊绑定</p><h2>双群地址</h2></div><div class="row-actions"><button id="toggleBountyUrls" type="button">显示地址</button><button id="refreshBounties" type="button">刷新记录</button></div></div>
+        <div class="two">
+          <label>主群<span id="bountyMainGroupName">圣女小小的淫光大教堂（入群拟定身份后入戏）</span><input id="bountyMainGroupUrl" type="password" autocomplete="off" readonly></label>
+          <label>悬赏群<span id="bountyGroupName">《圣殿悬赏令》（禁闲聊违反者清算）</span><input id="bountySystemGroupUrl" type="password" autocomplete="off"></label>
+        </div>
+        <label>用户邀请链接<span>发布成功后作为一条完全独立、只含链接的消息发送。</span><input id="bountyInviteUrl" type="password" autocomplete="off"></label>
+        <div class="notice">悬赏群聊天 URL 用于机器人监听；邀请链接只发给用户。两者不是同一个东西，别把这俩混成一锅粥。</div>
+      </details>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>委托所设置</span><small>全部命令、回复模板与 AI 解析</small></summary>
+        <div class="section-title"><div><p class="eyebrow">双向委托</p><h2>统一命令系统</h2></div></div>
+        <div class="checks"><label><input id="bountyEnabled" type="checkbox"> 启用群友委托所</label></div>
+        <div class="three">
+          <label>发布需求<input id="commissionRequestPublishCommands"></label>
+          <label>发布服务<input id="commissionServicePublishCommands"></label>
+          <label>确认发布<input id="commissionConfirmDraftCommands"></label>
+          <label>取消发布<input id="commissionCancelDraftCommands"></label>
+          <label>查看需求<input id="commissionRequestListCommands"></label>
+          <label>查看服务<input id="commissionServiceListCommands"></label>
+          <label>需求详情<input id="commissionRequestDetailCommands"></label>
+          <label>服务详情<input id="commissionServiceDetailCommands"></label>
+          <label>接取需求<input id="commissionRequestAcceptCommands"></label>
+          <label>购买服务<input id="commissionServiceAcceptCommands"></label>
+          <label>我的发布<input id="commissionMyPostsCommands"></label>
+          <label>我的需求<input id="commissionMyDemandsCommands"></label>
+          <label>我的服务<input id="commissionMyServicesCommands"></label>
+          <label>我的订单<input id="commissionMyOrdersCommands"></label>
+          <label>订单详情<input id="commissionOrderDetailCommands"></label>
+          <label>提交完成<input id="commissionOrderCompleteCommands"></label>
+          <label>确认订单<input id="commissionOrderConfirmCommands"></label>
+          <label>申请取消订单<input id="commissionOrderCancelCommands"></label>
+          <label>同意取消订单<input id="commissionOrderCancelApproveCommands"></label>
+          <label>拒绝取消订单<input id="commissionOrderCancelRejectCommands"></label>
+          <label>关闭需求<input id="commissionCloseRequestCommands"></label>
+          <label>下架服务<input id="commissionCloseServiceCommands"></label>
+          <label>补充服务库存<input id="commissionServiceRestockCommands"></label>
+          <label>续期服务<input id="commissionServiceRenewCommands"></label>
+          <label>委托帮助<input id="commissionHelpCommands"></label>
+        </div>
+        <div class="notice">核心默认命令为 <code>/需求：</code> 和 <code>/服务：</code>。发布只在大群生效，查看、接取、完成和确认只在悬赏群生效；全部命令均可自定义。翻页是在列表命令后添加页码，例如 <code>/查看需求2</code>、<code>/查看需求 2</code>、<code>/查看服务2</code> 或 <code>/查看服务 2</code>。</div>
+        <div class="three hidden" hidden>
+          <label>发布命令<input id="bountyPublishCommands"></label>
+          <label>列表命令<input id="bountyListCommands"></label>
+          <label>查看详情命令<input id="bountyDetailCommands"></label>
+          <label>接取命令<input id="bountyAcceptCommands"></label>
+          <label>我的悬赏命令<input id="bountyMyCommands"></label>
+          <label>申请完成命令<input id="bountyCompleteCommands"></label>
+          <label>确认完成命令<input id="bountyConfirmCommands"></label>
+          <label>取消命令<input id="bountyCancelCommands"></label>
+        </div>
+        <div class="notice">需求由发布者托管；服务是可购买的商品，可设置有限库存或不限库存。每次购买一份会占用一份库存并独立生成 O 订单。</div>
+        <details><summary>统一回复文案</summary>
+          <div class="two">
+            <label>只能在大群发布<textarea id="commissionMainGroupOnlyReply" rows="2"></textarea></label>
+            <label>只能在悬赏群操作<textarea id="commissionBountyGroupOnlyReply" rows="2"></textarea></label>
+            <label>需求发布预览<textarea id="commissionRequestPreviewReply" rows="7"></textarea></label>
+            <label>服务发布预览<textarea id="commissionServicePreviewReply" rows="7"></textarea></label>
+            <label>正式发布成功<textarea id="commissionPublishedReply" rows="3"></textarea></label>
+            <label>取消草稿<textarea id="commissionDraftCancelledReply" rows="2"></textarea></label>
+            <label>草稿不存在<textarea id="commissionDraftMissingReply" rows="2"></textarea></label>
+            <label>草稿已过期<textarea id="commissionDraftExpiredReply" rows="2"></textarea></label>
+            <label>需求详情卡片<textarea id="commissionRequestCardReply" rows="7"></textarea></label>
+            <label>服务详情卡片<textarea id="commissionServiceCardReply" rows="7"></textarea></label>
+            <label>接取后生成订单<textarea id="commissionOrderCreatedReply" rows="5"></textarea></label>
+            <label>订单提交完成<textarea id="commissionOrderCompleteReply" rows="3"></textarea></label>
+            <label>订单确认结算<textarea id="commissionOrderConfirmReply" rows="3"></textarea></label>
+            <label>申请取消订单<textarea id="commissionOrderCancelRequestedReply" rows="3"></textarea></label>
+            <label>同意取消订单<textarea id="commissionOrderCancelApprovedReply" rows="3"></textarea></label>
+            <label>拒绝取消订单<textarea id="commissionOrderCancelRejectedReply" rows="3"></textarea></label>
+            <label>订单错误<textarea id="commissionOrderErrorReply" rows="2"></textarea></label>
+            <label>关闭委托<textarea id="commissionPostClosedReply" rows="2"></textarea></label>
+          </div>
+          <label>委托所完整帮助<textarea id="commissionHelpReply" rows="10"></textarea></label>
+        </details>
+        <details><summary>需求列表文案（机器人强制压缩为最多9行）</summary>
+          <div class="two"><label>列表标题<textarea id="commissionRequestListHeaderReply" rows="2"></textarea></label><label>每条需求<textarea id="commissionRequestListItemReply" rows="2"></textarea></label><label>空列表<textarea id="commissionRequestListEmptyReply" rows="2"></textarea></label><label>列表尾部<span>变量：{number} {detail_command} {accept_command}；多页时自动追加翻页命令。</span><textarea id="commissionRequestListFooterReply" rows="2"></textarea></label></div>
+        </details>
+        <details><summary>服务列表文案（机器人强制压缩为最多9行）</summary>
+          <div class="two"><label>列表标题<textarea id="commissionServiceListHeaderReply" rows="2"></textarea></label><label>每条服务<textarea id="commissionServiceListItemReply" rows="2"></textarea></label><label>空列表<textarea id="commissionServiceListEmptyReply" rows="2"></textarea></label><label>列表尾部<span>变量：{number} {detail_command} {accept_command}；多页时自动追加翻页命令。</span><textarea id="commissionServiceListFooterReply" rows="2"></textarea></label><label class="hidden">历史服务行<textarea id="commissionLegacyServiceItemReply" rows="2"></textarea></label><label class="hidden">历史兼容提示<textarea id="commissionLegacyServiceFooterReply" rows="2"></textarea></label></div>
+        </details>
+        <details open><summary>需求业务规则与独立AI提示词</summary>
+          <p class="note">只解析“用户想花功德找人做什么”。人数是需要多少位接取者，奖励是每人获得的功德。</p>
+          <div class="four">
+            <label>需求抽成（%）<input id="commissionDemandFeePercent" type="number" min="0" max="100"></label>
+            <label>最低每人奖励<input id="commissionDemandMinReward" type="number" min="1"></label>
+            <label>最多需求人数<input id="commissionDemandMaxPeople" type="number" min="1" max="10"></label>
+            <label>默认招募天数<input id="commissionDemandDefaultDays" type="number" min="1" max="365"></label>
+          </div>
+          <label>需求AI系统提示词<textarea id="commissionDemandAiSystemPrompt" rows="12"></textarea></label>
+          <label>需求AI用户提示词<span>变量：{original}</span><textarea id="commissionDemandAiUserPrompt" rows="4"></textarea></label>
+        </details>
+        <details open><summary>服务业务规则与独立AI提示词</summary>
+          <p class="note">只解析“用户持续出售什么”。人数、份数、数量都解释为库存；不限人数解释为无限库存，不是任务人数。</p>
+          <div class="three">
+            <label>卖家抽成（%）<input id="commissionServiceCommissionPercent" type="number" min="0" max="100"></label>
+            <label>最低单价<input id="commissionServiceMinPrice" type="number" min="1"></label>
+            <label>默认库存<input id="commissionServiceDefaultStock" type="number" min="1" max="999"></label>
+            <label>库存上限<input id="commissionServiceMaxStock" type="number" min="1" max="999"></label>
+            <label>默认上架天数<input id="commissionServiceDefaultDays" type="number" min="1" max="365"></label>
+            <label>每人最多在售<input id="commissionServiceMaxActive" type="number" min="1" max="100"></label>
+          </div>
+          <label>服务AI系统提示词<textarea id="commissionServiceAiSystemPrompt" rows="12"></textarea></label>
+          <label>服务AI用户提示词<span>变量：{original}</span><textarea id="commissionServiceAiUserPrompt" rows="4"></textarea></label>
+        </details>
+        <details><summary>提示词历史版本</summary><p class="note">每次覆盖前自动保存旧版本，可一键恢复，刷新页面不会清空。</p><div id="commissionPromptHistory" class="table">暂无历史版本。</div></details>
+        <div class="hidden" hidden>
+        <div class="section-title" style="margin-top:20px"><div><p class="eyebrow">历史兼容字段</p><h2>旧悬赏回复模板</h2></div></div>
+        <div class="notice">这里只能编辑固定文案和占位变量；人数、功德托管、手续费、余额与结算仍由代码计算。命令与编号之间有无空格均可识别。</div>
+        <details><summary>帮助、卡片与列表</summary>
+          <label>悬赏帮助回复<textarea id="bountyHelpReply" rows="10"></textarea></label>
+          <div class="two"><label>系统关闭回复<textarea id="bountyDisabledReply" rows="2"></textarea></label><label>群聊限制回复<textarea id="bountyGroupOnlyReply" rows="2"></textarea></label></div>
+          <label>悬赏详情/发布卡片<span>变量：{title} {number} {status} {publisher} {accepted_count} {required_count} {remaining_count} {reward_per_person} {escrow} {fee} {total} {duration} {deadline} {content} {accept_line} {newline}</span><textarea id="bountyCardReply" rows="9"></textarea></label>
+          <label>卡片接取指引<span>变量：{number} {newline}</span><textarea id="bountyCardAcceptLine" rows="2"></textarea></label>
+          <label>同步到悬赏群提示<textarea id="bountySyncedReply" rows="2"></textarea></label>
+          <label>列表标题<span>变量：{count} {newline}</span><textarea id="bountyListHeaderReply" rows="3"></textarea></label>
+          <label>列表单行<span>变量：{index} {number} {accepted_count} {required_count} {reward_per_person} {duration} {content}</span><textarea id="bountyListItemReply" rows="2"></textarea></label>
+          <div class="two"><label>列表为空回复<textarea id="bountyListEmptyReply" rows="2"></textarea></label><label>列表尾部指引<textarea id="bountyListFooterReply" rows="3"></textarea></label></div>
+          <div class="two"><label>查看格式错误<textarea id="bountyDetailUsageReply" rows="2"></textarea></label><label>查看序号不存在<textarea id="bountyDetailNotFoundReply" rows="2"></textarea></label></div>
+        </details>
+        <details><summary>接取悬赏回复</summary>
+          <label>接取成功<span>变量：{number} {accepted_count} {required_count} {content} {duration} {deadline} {reward_per_person} {newline}</span><textarea id="bountyAcceptSuccessReply" rows="7"></textarea></label>
+          <div class="two">
+            <label>格式错误<textarea id="bountyAcceptUsageReply" rows="2"></textarea></label><label>编号不存在<textarea id="bountyAcceptNotFoundReply" rows="2"></textarea></label>
+            <label>已经结束<textarea id="bountyAcceptNotWaitingReply" rows="2"></textarea></label><label>重复接取<textarea id="bountyAcceptDuplicateReply" rows="2"></textarea></label>
+            <label>名额已满<textarea id="bountyAcceptFullReply" rows="2"></textarea></label><label>接取自己的悬赏<textarea id="bountyAcceptSelfReply" rows="2"></textarea></label>
+            <label>暂停接取<span>变量：{banned_until}</span><textarea id="bountyAcceptBannedReply" rows="2"></textarea></label><label>其他失败<textarea id="bountyAcceptFailedReply" rows="2"></textarea></label>
+          </div>
+        </details>
+        <details><summary>我的悬赏回复</summary>
+          <div class="two"><label>总标题<span>变量：{user}</span><textarea id="bountyMyHeaderReply" rows="2"></textarea></label><label>项目行<span>变量：{number} {status} {reward_per_person}</span><textarea id="bountyMyItemReply" rows="2"></textarea></label></div>
+          <div class="three"><label>我发布的标题<textarea id="bountyMyPublishedHeaderReply" rows="2"></textarea></label><label>我接取的标题<textarea id="bountyMyTakenHeaderReply" rows="2"></textarea></label><label>空列表文本<textarea id="bountyMyEmptyReply" rows="2"></textarea></label></div>
+        </details>
+        <details><summary>完成与确认回复</summary>
+          <div class="two">
+            <label>完成格式错误<textarea id="bountyCompleteUsageReply" rows="2"></textarea></label><label>完成编号不存在<textarea id="bountyCompleteNotFoundReply" rows="2"></textarea></label>
+            <label>不是接取人<textarea id="bountyCompleteNotTakerReply" rows="2"></textarea></label><label>已经申请完成<textarea id="bountyCompleteAlreadyReply" rows="2"></textarea></label>
+            <label>当前不能完成<textarea id="bountyCompleteInvalidReply" rows="2"></textarea></label><label>其他完成失败<textarea id="bountyCompleteFailedReply" rows="2"></textarea></label>
+          </div>
+          <label>参与者申请完成<span>变量：{number} {completed_count} {required_count} {publisher} {reward_per_person} {newline}</span><textarea id="bountyCompleteIndividualReply" rows="3"></textarea></label>
+          <div class="two">
+            <label>确认格式错误<textarea id="bountyConfirmUsageReply" rows="2"></textarea></label><label>确认编号不存在<textarea id="bountyConfirmNotFoundReply" rows="2"></textarea></label>
+            <label>不是发起人<textarea id="bountyConfirmNotPublisherReply" rows="2"></textarea></label><label>当前不能确认<textarea id="bountyConfirmInvalidReply" rows="2"></textarea></label>
+            <label>其他确认失败<textarea id="bountyConfirmFailedReply" rows="2"></textarea></label>
+          </div>
+          <label>单人结算成功（仍有未结算名额）<span>变量：{number} {name} {paid_total} {remaining} {newline}</span><textarea id="bountyConfirmPartialSuccessReply" rows="4"></textarea></label>
+          <label>最后一人结算成功<span>变量：{number} {name} {paid_total} {fee_burned} {newline}</span><textarea id="bountyConfirmFinalSuccessReply" rows="4"></textarea></label>
+        </details>
+        <details><summary>取消悬赏回复</summary>
+          <div class="two">
+            <label>取消格式错误<textarea id="bountyCancelUsageReply" rows="2"></textarea></label><label>取消编号不存在<textarea id="bountyCancelNotFoundReply" rows="2"></textarea></label>
+            <label>已经结束<textarea id="bountyCancelInvalidReply" rows="2"></textarea></label><label>不是当事人<textarea id="bountyCancelNotPartyReply" rows="2"></textarea></label>
+            <label>等待接取时非发起人<textarea id="bountyCancelNotPublisherReply" rows="2"></textarea></label><label>其他取消失败<textarea id="bountyCancelFailedReply" rows="2"></textarea></label>
+          </div>
+          <label>取消成功<span>变量：{number} {refund} {abandonment_text} {ban_text}</span><textarea id="bountyCancelSuccessReply" rows="3"></textarea></label>
+          <label>已有人员结算后取消<span>变量：{number} {refund} {abandonment_text} {ban_text}</span><textarea id="bountyCancelPartialSuccessReply" rows="3"></textarea></label>
+          <div class="two"><label>跑单附加文本<span>变量：{abandonment_count}</span><textarea id="bountyCancelAbandonmentReply" rows="2"></textarea></label><label>禁接附加文本<span>变量：{banned_until}</span><textarea id="bountyCancelBanReply" rows="2"></textarea></label></div>
+        </details>
+        <label>业务校验错误包装<span>变量：{reason}；余额不足、身份异常等核心校验原因会放入这里</span><textarea id="bountyBusinessErrorReply" rows="2"></textarea></label>
+        </div>
+        <div class="section-title" style="margin-top:20px"><div><p class="eyebrow">共享连接</p><h2>AI连接与通用异常回复</h2></div></div>
+        <div class="three">
+          <label>草稿有效期（秒）<input id="bountyAiDraftTtl" type="number" min="60" max="3600"></label>
+          <label>AI超时（秒）<input id="bountyAiTimeout" type="number" min="3" max="120"></label>
+          <label>AI模型<input id="bountyAiModel"></label>
+        </div>
+        <label>AI接口地址<input id="bountyAiBaseUrl"></label>
+        <label class="hidden" hidden>旧系统提示词<textarea id="bountyAiSystemPrompt" rows="10"></textarea></label>
+        <label class="hidden" hidden>旧用户提示词<textarea id="bountyAiUserPrompt" rows="4"></textarea></label>
+        <label>解析失败回复<span>变量：{reason}</span><textarea id="bountyAiFailureReply" rows="3"></textarea></label>
+        <label>AI未配置回复<textarea id="bountyAiNotConfiguredReply" rows="3"></textarea></label>
+        <label>AI异常回复<textarea id="bountyAiErrorReply" rows="3"></textarea></label>
+        <label>待确认预览<span>变量：{duration} {required_count} {reward_per_person} {escrow} {fee} {total} {content} {newline}</span><textarea id="bountyAiPreviewReply" rows="10"></textarea></label>
+        <label>发布成功回复<span>变量：{number} {escrow} {fee} {total} {newline}</span><textarea id="bountyAiPublishedReply" rows="5"></textarea></label>
+        <label>取消草稿回复<textarea id="bountyAiCancelledReply" rows="3"></textarea></label>
+        <div class="three"><label>草稿过期回复<textarea id="bountyAiExpiredReply" rows="3"></textarea></label><label>找不到草稿回复<textarea id="bountyAiMissingReply" rows="3"></textarea></label><label>草稿失效回复<textarea id="bountyAiInvalidReply" rows="3"></textarea></label></div>
+        <div class="toolbar"><button id="saveBountySettings" class="primary" type="button">保存群友委托所全部设置</button></div>
+        <div id="bountySaveResult" class="notice">尚未修改。</div>
+      </details>
+
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">任务型委托</p><h2>全部需求</h2><p>显示需求人数、每人奖励、托管资金和完成进度；编辑需求会同步校验托管差额。</p></div><button id="refreshCommissionHouse" type="button">刷新全部</button></div>
+        <div id="bountyHistory" class="table">正在加载需求…</div>
+      </div>
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">商品型委托</p><h2>全部服务</h2><p>显示单价、库存、销量和上架截止时间；无限库存服务可在有效期内被多人反复购买。</p></div></div>
+        <div id="commissionServiceTable" class="table">正在加载服务…</div>
+      </div>
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">逐单处理</p><h2>委托订单管理</h2><p>可标记完成、强制结算、退款取消或恢复待确认订单；每次操作必须填写原因并写入审计记录。</p></div><button id="refreshCommissionOrders" type="button">刷新订单</button></div>
+        <div id="commissionOrderTable" class="table">正在加载委托订单…</div>
+      </div>
+      <div id="commissionLegacyMarket" class="hidden" hidden style="margin-top:28px">
+      <header><p class="eyebrow">原有数据保留</p><h2>保留的服务与已结算订单</h2><p>原内容、库存、交易金额与已完成订单全部保留，并统一使用S服务编号和O订单编号。</p></header>
+      <div class="notice">这里不是独立功能模块。保留的在售项目会直接出现在“查看服务”中；已结算订单不会重复扣款，也不会影响官方群商店。</div>
+      <div class="grid cards" style="margin-top:20px">
+        <article class="card"><div class="label">正在出售</div><div id="marketOnSaleCount" class="value">0 件</div></article>
+        <article class="card"><div class="label">累计订单</div><div id="marketOrderCount" class="value">0 单</div></article>
+        <article class="card"><div class="label">累计成交</div><div id="marketGrossAmount" class="value">0 功德</div></article>
+        <article class="card"><div class="label">系统回收</div><div id="marketCommissionAmount" class="value">0 功德</div></article>
+      </div>
+
+      <details class="panel form settings-disclosure hidden" style="margin-top:20px" hidden>
+        <summary><span>市场规则</span><small>默认值、限制、抽成与 AI 连接</small></summary>
+        <div class="section-title"><div><p class="eyebrow">交易规则</p><h2>基础设置</h2></div><button id="refreshMarketplace" type="button">刷新</button></div>
+        <div class="checks"><label><input id="marketEnabled" type="checkbox"> 启用群友市场</label></div>
+        <div class="four">
+          <label>成交抽成（%）<input id="marketCommissionPercent" type="number" min="0" max="100"></label>
+          <label>每人最多在售<input id="marketMaxActive" type="number" min="1" max="100"></label>
+          <label>默认库存<input id="marketDefaultStock" type="number" min="1" max="999"></label>
+          <label>默认有效期（天）<input id="marketDefaultDuration" type="number" min="1" max="365"></label>
+        </div>
+        <div class="four">
+          <label>最低价格<input id="marketMinPrice" type="number" min="1"></label>
+          <label>最高价格<input id="marketMaxPrice" type="number" min="1"></label>
+          <label>每页商品数<input id="marketPageSize" type="number" min="1" max="10"></label>
+          <label>草稿有效期（秒）<input id="marketDraftTtl" type="number" min="60" max="3600"></label>
+        </div>
+        <div class="three">
+          <label>库存上限<input id="marketMaxStock" type="number" min="1"></label>
+          <label>有效期上限（天）<input id="marketMaxDuration" type="number" min="1"></label>
+          <label>AI 超时（秒）<input id="marketAiTimeout" type="number" min="3" max="120"></label>
+        </div>
+        <div class="two"><label>AI 接口地址<input id="marketAiBaseUrl"></label><label>AI 模型<select id="marketAiModel"><option value="deepseek-v4-flash">deepseek-v4-flash</option><option value="deepseek-v4-pro">deepseek-v4-pro</option></select></label></div>
+        <div id="marketAiStatus" class="notice">正在读取 DeepSeek 连接状态…</div>
+      </details>
+
+      <details class="panel form settings-disclosure hidden" style="margin-top:20px" hidden>
+        <summary><span>市场指令设置</span><small>完整查看并修改全部群友市场指令</small></summary>
+        <div class="section-title"><div><p class="eyebrow">群聊入口</p><h2>全部市场指令</h2></div></div>
+        <p class="note">每项支持填写多个触发词，使用英文逗号分隔。这里只填写指令本体，不要填写商品编号、页码、冒号、数量或商品内容；保存后帮助文案中的默认指令会同步替换。</p>
+        <div class="two">
+          <label>查看市场<span>用法：指令或指令2查看第2页</span><input id="marketListCommands" value="/市场"></label>
+          <label>市场帮助<span>显示完整市场玩法</span><input id="marketHelpCommands" value="/市场帮助"></label>
+          <label>发起上架<span>后接：商品内容和明确价格</span><input id="marketCreateCommands" value="/上架市场"></label>
+          <label>确认上架<span>确认当前上架草稿</span><input id="marketConfirmCreateCommands" value="/确认上架"></label>
+          <label>取消上架<span>取消当前上架草稿</span><input id="marketCancelCreateCommands" value="/取消上架"></label>
+          <label>修改商品<span>后接：M编号、新资料</span><input id="marketEditCommands" value="/修改市场"></label>
+          <label>确认修改<span>确认当前修改草稿</span><input id="marketConfirmEditCommands" value="/确认修改"></label>
+          <label>取消修改<span>取消当前修改草稿</span><input id="marketCancelEditCommands" value="/取消修改"></label>
+          <label>商品详情<span>后接：M编号</span><input id="marketDetailCommands" value="/市场详情"></label>
+          <label>购买商品<span>后接：M编号，可加 *数量</span><input id="marketPurchaseCommands" value="/市场购买"></label>
+          <label>我的市场<span>查看本人上架与购买记录</span><input id="marketMineCommands" value="/我的市场"></label>
+          <label>下架商品<span>后接：本人商品M编号</span><input id="marketOffShelfCommands" value="/下架市场"></label>
+          <label>续期商品<span>后接：M编号，可加 *天数</span><input id="marketRenewCommands" value="/续期市场"></label>
+        </div>
+        <div class="toolbar"><button id="saveMarketplaceCommands" class="primary" type="button">保存市场指令</button></div>
+        <div id="marketCommandSaveResult" class="notice">当前列出了群友市场全部 13 组指令。</div>
+      </details>
+
+      <details class="panel form settings-disclosure hidden" style="margin-top:20px" hidden>
+        <summary><span>AI 编辑与全部回复</span><small>自然语言解析和群聊文案均可自由编辑</small></summary>
+        <label>市场 AI 系统提示词<span>独立于官方商店、AI角色、悬赏和付费互动。</span><textarea id="marketAiSystemPrompt" rows="10"></textarea></label>
+        <label>市场 AI 用户提示词<span>变量：{original} {newline}</span><textarea id="marketAiUserPrompt" rows="4"></textarea></label>
+        <div class="two">
+          <label>功能关闭回复<textarea id="marketDisabledReply" rows="2"></textarea></label>
+          <label>AI 未配置回复<textarea id="marketAiNotConfiguredReply" rows="2"></textarea></label>
+          <label>AI 失败回复<textarea id="marketAiErrorReply" rows="3"></textarea></label>
+          <label>草稿取消回复<textarea id="marketDraftCancelledReply" rows="2"></textarea></label>
+          <label>草稿不存在回复<textarea id="marketDraftMissingReply" rows="2"></textarea></label>
+          <label>列表为空回复<textarea id="marketListEmptyReply" rows="2"></textarea></label>
+        </div>
+        <label>草稿预览<span>变量：{title} {description} {price} {stock} {duration_days} {commission_percent} {seller_net} {confirm_command} {cancel_command} {newline}</span><textarea id="marketDraftPreviewReply" rows="9"></textarea></label>
+        <div class="two"><label>上架成功回复<textarea id="marketCreatedReply" rows="3"></textarea></label><label>修改成功回复<textarea id="marketUpdatedReply" rows="3"></textarea></label></div>
+        <div class="two"><label>列表标题<textarea id="marketListHeaderReply" rows="2"></textarea></label><label>列表每行<textarea id="marketListItemReply" rows="2"></textarea></label></div>
+        <label>列表底部提示<textarea id="marketListFooterReply" rows="2"></textarea></label>
+        <label>商品详情回复<textarea id="marketDetailReply" rows="7"></textarea></label>
+        <label>购买成功回复<textarea id="marketPurchaseReply" rows="6"></textarea></label>
+        <div class="two"><label>下架成功回复<textarea id="marketOffShelfReply" rows="2"></textarea></label><label>续期成功回复<textarea id="marketRenewedReply" rows="2"></textarea></label></div>
+        <label>市场帮助回复<textarea id="marketHelpReply" rows="10"></textarea></label>
+        <div class="toolbar"><button id="saveMarketplaceSettings" class="primary" type="button">保存市场设置与文案</button></div>
+        <div id="marketSaveResult" class="notice">尚未修改。</div>
+      </details>
+
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">服务管理</p><h2>全部保留服务</h2></div></div>
+        <div id="marketListingTable" class="table">暂无市场商品。</div>
+      </div>
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">已结算记录</p><h2>最近服务订单</h2></div></div>
+        <div id="marketOrderTable" class="table">暂无市场订单。</div>
+      </div>
+      </div>
+    </section>
+
+    <section id="rp" class="page">
+      <header><p class="eyebrow">沉浸角色扮演</p><h1>RP结界</h1><p>RP 会话、规则与违规处理</p></header>
+      <details class="panel form settings-disclosure">
+        <summary><span>RP 结界设置</span><small>参与人数、集结规则与回复模板</small></summary>
+        <div class="section-title"><div><p class="eyebrow">规则与文案</p><h2>RP结界设置</h2></div><button type="button" id="refreshRpSettings">刷新</button></div>
+        <div class="checks"><label><input id="rpEnabled" type="checkbox"> 启用RP结界</label></div>
+        <div class="two">
+          <label>最大参与人数<input id="rpMaxParticipants" type="number" min="1" max="10"></label>
+          <label>集结超时（秒）<input id="rpGatherTimeout" type="number" min="30" max="3600"></label>
+        </div>
+        <label>发起集结回复<span>变量：{target_count} {wait_minutes}</span><textarea id="rpStartReply" rows="3"></textarea></label>
+        <label>普通进度回复<span>变量：{current_count} {target_count} {remaining_count}</span><textarea id="rpProgressReply" rows="3"></textarea></label>
+        <label>仅差一人回复<span>变量：{current_count} {target_count}</span><textarea id="rpLastReply" rows="3"></textarea></label>
+        <label>结界开启公告<span>变量：{target_count} {newline}；最多20行，由统一发送层拆成两条。</span><textarea id="rpAnnouncementReply" rows="12"></textarea></label>
+        <label>第一次黄牌警告<span>变量：{nickname} {count}</span><textarea id="rpYellowWarningReply" rows="4"></textarea></label>
+        <label>第二次踢出处理通知<span>只通知管理员人工处理，不得写成机器人已自动踢人。变量：{nickname} {count}</span><textarea id="rpSecondViolationReply" rows="4"></textarea></label>
+        <label>后续违规简短提醒<span>变量：{nickname} {count}</span><textarea id="rpLaterViolationReply" rows="3"></textarea></label>
+        <label>结界结束回复<textarea id="rpEndReply" rows="3"></textarea></label>
+        <label>集结超时回复<textarea id="rpTimeoutReply" rows="3"></textarea></label>
+        <div class="toolbar"><button id="saveRpSettings" class="primary" type="button">保存RP设置</button></div>
+        <div id="rpSaveResult" class="notice">尚未修改。</div>
+      </details>
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">实时状态</p><h2>当前会话与待管理员处理</h2></div><button type="button" onclick="loadRpAdmin()">刷新</button></div>
+        <div id="rpAdmin" class="bounty-groups"><div class="notice">正在加载RP记录…</div></div>
+      </div>
+    </section>
+
+    <section id="random-events" class="page">
+      <header><p class="eyebrow">剧情事件库与RP联动</p><h1>随机事件</h1><p>管理员创建剧情、定时招募、编号选角，并在人数到齐后自动开启现有RP结界</p></header>
+
+      <details class="panel form settings-disclosure" open>
+        <summary><span>指令设置（全部命令）</span><small>这里包含随机事件从创建到奖励的所有群聊指令</small></summary>
+        <div class="section-title"><div><p class="eyebrow">可编辑指令</p><h2>随机事件完整命令表</h2></div></div>
+        <div class="two">
+          <label>创建事件命令<span>管理员；示例：/创建随机事件：具体剧情</span><input id="randomEventCreateCommands"></label>
+          <label>确认创建命令<span>管理员；确认AI草稿入库</span><input id="randomEventConfirmCommands"></label>
+          <label>取消草稿命令<span>管理员；放弃AI草稿</span><input id="randomEventCancelCommands"></label>
+          <label>发起事件命令<span>管理员；从事件库随机抽取</span><input id="randomEventStartCommands"></label>
+          <label>事件状态命令<span>所有人；查看角色与招募进度</span><input id="randomEventStatusCommands"></label>
+          <label>加入命令<span>所有人；/加入自动分配，/加入2选择2号角色</span><input id="randomEventJoinCommands"></label>
+          <label>退队命令<span>参与者；释放已选择角色</span><input id="randomEventLeaveCommands"></label>
+          <label>结束命令<span>参与者或管理员；同步关闭RP结界</span><input id="randomEventEndCommands"></label>
+          <label>完成奖励命令<span>管理员；示例：/奖励100，每场只能发一次</span><input id="randomEventRewardCommands"></label>
+        </div>
+        <div class="notice">多个命令别名请用英文逗号分隔。每项必须保留至少一个以 / 开头的命令。</div>
+      </details>
+
+      <details class="panel form settings-disclosure" open style="margin-top:20px">
+        <summary><span>基础与自动发起</span><small>招募时间、每日次数与固定发起时间</small></summary>
+        <div class="checks">
+          <label><input id="randomEventEnabled" type="checkbox"> 启用随机事件</label>
+          <label><input id="randomEventAutoEnabled" type="checkbox"> 启用每日自动发起</label>
+        </div>
+        <div class="three">
+          <label>招募超时（秒）<input id="randomEventRecruitTimeout" type="number" min="60" max="3600"></label>
+          <label>AI草稿有效期（秒）<input id="randomEventDraftTtl" type="number" min="60" max="3600"></label>
+          <label>每天自动发起次数<input id="randomEventAutoCount" type="number" min="1" max="12"></label>
+        </div>
+        <label>每天发起时间<span>按 HH:MM 填写并用逗号分隔；时间数量必须不少于每天次数，例如：12:30,18:00,22:30</span><input id="randomEventAutoTimes" placeholder="20:00"></label>
+        <div class="notice">手动发起不占用自动次数。机器人关闭期间错过的时间不会补发；当群里已有RP或随机事件时，本次自动发起会跳过。</div>
+      </details>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>AI解析设置</span><small>只在创建事件草稿时调用DeepSeek</small></summary>
+        <div class="three">
+          <label>API地址<input id="randomEventAiBaseUrl"></label>
+          <label>模型<input id="randomEventAiModel"></label>
+          <label>超时（秒）<input id="randomEventAiTimeout" type="number" min="3" max="120"></label>
+        </div>
+          <label>随机事件AI系统提示词<span>不能为空；角色性别只表示剧情角色，不检查群友现实性别</span><textarea id="randomEventAiSystemPrompt" rows="16"></textarea></label>
+          <label>随机事件AI用户提示词<span>变量：{original} {newline}</span><textarea id="randomEventAiUserPrompt" rows="5"></textarea></label>
+          <div class="notice">剧情保留规则由程序强制执行：完整、连贯的原文会原样入库，AI只提取标题和角色；只有残缺或不连贯时才允许重构，且不得缩写成梗概。</div>
+      </details>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>回复文案设置</span><small>所有随机事件提示、招募、结束与奖励文案</small></summary>
+        <div id="randomEventReplyFields"></div>
+      </details>
+
+      <div class="panel" style="margin-top:20px">
+        <div class="toolbar"><button id="saveRandomEventSettings" class="primary" type="button">保存随机事件全部设置</button><button id="refreshRandomEvents" type="button">刷新</button></div>
+        <div id="randomEventSaveResult" class="notice">尚未修改。</div>
+      </div>
+
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">事件资料</p><h2>随机事件库</h2></div><button id="createRandomEventTemplate" type="button">后台新建事件</button></div>
+        <div id="randomEventTemplates" class="bounty-groups"><div class="notice">正在加载事件库…</div></div>
+      </div>
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">实时状态</p><h2>当前招募与进行中事件</h2></div></div>
+        <div id="randomEventCurrent" class="bounty-groups"><div class="notice">暂无进行中的随机事件。</div></div>
+      </div>
+      <div class="panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">执行记录</p><h2>历史事件与自动发起记录</h2></div></div>
+        <div id="randomEventHistory" class="bounty-groups"></div>
+        <div id="randomEventScheduleRuns" class="table"></div>
+      </div>
+    </section>
+
+    <section id="image-generation" class="page">
+      <header><p class="eyebrow">独立绘图群与Image2</p><h1>图片生成</h1><p>仅在指定绘图群响应命令；功德扣费、比例、限制、文案和历史记录均可管理</p></header>
+
+      <details class="panel form settings-disclosure" open>
+        <summary><span>指令设置（全部命令）</span><small>默认、竖屏与横屏三条生成路线</small></summary>
+        <div class="checks"><label><input id="imageEnabled" type="checkbox"> 启用图片生成</label><label><input id="imageCaseSensitive" type="checkbox"> 命令区分大小写</label></div>
+        <label>绘图群地址<span>该地址必须与主群、悬赏群不同</span><input id="imageModuleGroupUrl"></label>
+        <div class="three">
+          <label>默认命令<span>示例：/SC 一只可爱猫猫</span><input id="imageDefaultCommands"></label>
+          <label>竖屏命令<span>示例：/SC竖屏 一只猫猫</span><input id="imagePortraitCommands"></label>
+          <label>横屏命令<span>示例：/SC横屏 一片海边</span><input id="imageLandscapeCommands"></label>
+        </div>
+        <div class="three">
+          <label>默认比例<select id="imageDefaultRatio"><option>1:1</option><option>3:4</option><option>4:3</option><option>9:16</option><option>16:9</option></select></label>
+          <label>竖屏比例<select id="imagePortraitRatio"><option>1:1</option><option>3:4</option><option>4:3</option><option>9:16</option><option>16:9</option></select></label>
+          <label>横屏比例<select id="imageLandscapeRatio"><option>1:1</option><option>3:4</option><option>4:3</option><option>9:16</option><option>16:9</option></select></label>
+        </div>
+        <div class="notice">主群与悬赏群发送这些命令时，只提示前往绘图群，不调用API、不扣功德。</div>
+      </details>
+
+      <details class="panel form settings-disclosure" open style="margin-top:20px">
+        <summary><span>费用、安全与并发</span><small>默认20功德、最多2000字、失败自动退款</small></summary>
+        <div class="three">
+          <label>每次消耗功德<input id="imageCost" type="number" min="0"></label>
+          <label>提示词最大字符<input id="imageMaxPromptChars" type="number" min="1" max="2000"></label>
+          <label>用户冷却秒数<input id="imageCooldownSeconds" type="number" min="0"></label>
+          <label>每人每日上限<span>0表示不限</span><input id="imagePerUserDailyLimit" type="number" min="0"></label>
+          <label>全群每日上限<span>0表示不限</span><input id="imageGlobalDailyLimit" type="number" min="0"></label>
+          <label>最大并发任务<input id="imageMaxConcurrent" type="number" min="1" max="3"></label>
+        </div>
+        <div class="checks">
+          <label><input id="imageAdminExemptLimits" type="checkbox"> 管理员不受次数与冷却限制</label>
+          <label><input id="imageAdminFree" type="checkbox"> 管理员免费</label>
+          <label><input id="imageRefundApiFailure" type="checkbox"> API失败自动退款</label>
+          <label><input id="imageRefundUploadFailure" type="checkbox"> 群聊上传失败也退款</label>
+          <label><input id="imageRefundInterrupt" type="checkbox"> 程序中断自动退款</label>
+        </div>
+      </details>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>API与文件参数</span><small>Image2请求、下载、上传、缩略图与历史保留</small></summary>
+        <div class="three">
+          <label>API地址<input id="imageApiBase"></label>
+          <label>模型<input id="imageApiModel"></label>
+          <label>API密钥<span>留空不修改</span><input id="imageApiKey" type="password" autocomplete="new-password"></label>
+          <label>API超时秒数<input id="imageApiTimeout" type="number"></label>
+          <label>下载超时秒数<input id="imageDownloadTimeout" type="number"></label>
+          <label>群聊上传超时秒数<input id="imageUploadTimeout" type="number"></label>
+          <label>最大图片MB<input id="imageMaxFileMb" type="number"></label>
+          <label>历史每页数量<input id="imageHistoryPageSize" type="number"></label>
+          <label>历史保留天数<span>0表示永久</span><input id="imageHistoryRetentionDays" type="number"></label>
+          <label>缩略图最大边<input id="imageThumbnailDimension" type="number"></label>
+          <label>缩略图质量<input id="imageThumbnailQuality" type="number"></label>
+        </div>
+        <div class="checks"><label><input id="imageHistorySavePrompt" type="checkbox"> 历史记录保存完整提示词</label><label><input id="imageSendSuccessReply" type="checkbox"> 图片后发送成功文案</label></div>
+      </details>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>回复文案设置</span><small>受理、限制、失败、退款和重发提示全部可编辑</small></summary>
+        <div class="notice">通用变量包括：{user} {ratio} {cost} {balance} {job_id} {error} {refund_text} {newline}。</div>
+        <div id="imageReplyFields"></div>
+      </details>
+
+      <div class="panel" style="margin-top:20px">
+        <div class="toolbar"><button id="saveImageGenerationSettings" class="primary" type="button">保存图片生成全部设置</button><button id="clearImageApiKeyModule" type="button">清除图片API密钥</button><button id="testImageGenerationApi" type="button">真实生成测试</button><button id="openImageGroupModule" type="button">打开绘图群</button><button id="refreshImageHistory" type="button">刷新记录</button></div>
+        <div id="imageGenerationSaveResult" class="notice">尚未修改。API密钥只保存在独立密钥文件，不会显示明文。</div>
+      </div>
+
+      <section class="panel image-history-panel" style="margin-top:20px">
+        <div class="section-title"><div><p class="eyebrow">本地可追溯记录</p><h2>图片生成历史</h2></div><span id="imageHistoryStats" class="badge">正在读取</span></div>
+        <div class="toolbar image-history-filter"><input id="imageHistorySearch" placeholder="搜索任务号、昵称或提示词"><select id="imageHistoryStatus"><option value="">全部状态</option><option value="completed">已完成</option><option value="failed">生成失败</option><option value="upload_failed">上传失败</option><option value="interrupted">已中断</option></select><button id="searchImageHistory" type="button">搜索</button></div>
+        <div id="imageHistoryGrid" class="image-history-grid"><div class="notice">正在加载图片记录…</div></div>
+        <div class="toolbar"><button id="imageHistoryPrev" type="button">上一页</button><span id="imageHistoryPageLabel">第1页</span><button id="imageHistoryNext" type="button">下一页</button></div>
+      </section>
+    </section>
+
+    <div id="imagePreviewModal" class="modal hidden"><div class="dialog image-preview-dialog">
+      <div class="section-title"><div><p class="eyebrow">历史图片</p><h2 id="imagePreviewTitle">查看大图</h2></div><button id="closeImagePreview" type="button">关闭</button></div>
+      <img id="imagePreviewFull" alt="图片生成历史大图">
+      <div class="toolbar"><a id="imagePreviewDownload" class="button-link" download>保存原图</a><button id="imagePreviewResend" type="button">重新发送到绘图群</button></div>
+    </div></div>
+
+    <div id="randomEventTemplateModal" class="modal hidden"><form id="randomEventTemplateForm" class="dialog wide-dialog form">
+      <div class="section-title"><div><p class="eyebrow">事件库编辑</p><h2 id="randomEventTemplateTitle">编辑随机事件</h2></div><button id="closeRandomEventTemplateModal" type="button">关闭</button></div>
+      <input id="randomEventTemplateId" type="hidden">
+      <label>事件标题<input id="randomEventTemplateName" maxlength="30" required></label>
+      <label>剧情内容<textarea id="randomEventTemplateContent" rows="7" maxlength="1000" required></textarea></label>
+      <div class="checks"><label><input id="randomEventTemplateEnabled" type="checkbox" checked> 启用事件</label></div>
+      <label>角色资料<span>每行格式：角色名称｜男/女/不限｜角色说明；必须2至10行</span><textarea id="randomEventTemplateRoles" rows="10" required placeholder="正式修女｜女｜负责看守修道院并调查访客目的&#10;神秘访客｜男｜隐瞒身份并尝试进入禁区"></textarea></label>
+      <label>管理员备注<input id="randomEventTemplateNote" maxlength="500"></label>
+      <div id="randomEventTemplateResult" class="notice">编号由系统自动生成；已发起过的历史场次不会被改写。</div>
+      <div class="toolbar"><button id="archiveRandomEventTemplate" class="danger" type="button">归档事件</button><button class="primary" type="submit">保存事件</button></div>
+    </form></div>
+
+    <div id="bountyEditModal" class="modal hidden"><form id="bountyEditForm" class="dialog wide-dialog form">
+      <div class="section-title"><div><p class="eyebrow">安全业务编辑</p><h2 id="bountyEditTitle">编辑悬赏</h2></div><button type="button" id="closeBountyEditModal">关闭</button></div>
+      <input id="bountyEditId" type="hidden">
+      <div class="two">
+        <label>悬赏编号<span>不可修改</span><input id="bountyEditNumber" disabled></label>
+        <label>发布者<span>人员及平台唯一 ID 永远不可修改</span><input id="bountyEditPublisher" disabled></label>
+      </div>
+      <label>参与者<span>只读，包含平台唯一 ID；后台不会接受人员字段修改</span><textarea id="bountyEditParticipants" rows="4" disabled></textarea></label>
+      <label>悬赏内容<textarea id="bountyEditContent" rows="5" maxlength="500" required></textarea></label>
+      <div class="three">
+        <label>类型<select id="bountyEditDurationType"><option value="single">单次</option><option value="days">持续</option></select></label>
+        <label>持续天数<input id="bountyEditDurationDays" type="number" min="1" max="10"></label>
+        <label>需求人数 / 服务库存<span>需求最多10人；服务最多999份；选择不限库存时忽略</span><input id="bountyEditRequiredCount" type="number" min="1" max="999" required></label>
+      </div>
+      <div class="checks"><label><input id="bountyEditUnlimitedStock" type="checkbox"> 不限库存（仅服务可用；在有效期内持续出售）</label></div>
+      <div class="two">
+        <label>每人奖励<input id="bountyEditReward" type="number" min="1" max="100000" required></label>
+        <label>状态<select id="bountyEditStatus"><option value="waiting">待接取</option><option value="recruiting">招募中</option><option value="active">进行中</option><option value="awaiting_confirmation">待确认</option><option value="completed">已完成</option><option value="cancelled">已取消</option><option value="archived">已归档</option></select></label>
+      </div>
+      <label>管理员备注<input id="bountyEditAdminNote" maxlength="500"></label>
+      <label>操作原因<span>每次保存都写入审计记录</span><textarea id="bountyEditReason" rows="3" maxlength="500" required></textarea></label>
+      <div id="bountyEditResult" class="notice">资金增减由后端事务计算，页面不会直接改余额。</div>
+      <div class="toolbar"><button id="deleteBounty" class="danger" type="button">安全取消 / 归档</button><button class="primary" type="submit">保存修改</button></div>
+    </form></div>
+
+    <div id="marketEditModal" class="modal hidden"><form id="marketEditForm" class="dialog wide-dialog form">
+      <div class="section-title"><div><p class="eyebrow">市场商品审计编辑</p><h2 id="marketEditTitle">编辑市场商品</h2></div><button type="button" id="closeMarketEditModal">关闭</button></div>
+      <input id="marketEditId" type="hidden">
+      <div class="two"><label>商品编号<input id="marketEditNumber" disabled></label><label>卖家<span>卖家与唯一 ID 不可修改</span><input id="marketEditSeller" disabled></label></div>
+      <label>商品名称<input id="marketEditName" maxlength="30" required></label>
+      <label>商品说明<textarea id="marketEditDescription" rows="4" maxlength="160" required></textarea></label>
+      <div class="four">
+        <label>每份价格<input id="marketEditPrice" type="number" min="1" required></label>
+        <label>剩余库存<input id="marketEditStock" type="number" min="0" required></label>
+        <label>有效期天数<input id="marketEditDuration" type="number" min="1" required></label>
+        <label>状态<select id="marketEditStatus"><option value="on_sale">在售</option><option value="sold_out">售罄</option><option value="expired">过期</option><option value="off_shelf">下架</option><option value="suspended">暂停</option><option value="archived">归档</option></select></label>
+      </div>
+      <div class="three"><label>置顶位<select id="marketEditPin"><option value="0">不置顶</option><option value="1">置顶1</option><option value="2">置顶2</option><option value="3">置顶3</option></select></label><label>排序权重<input id="marketEditSort" type="number"></label><label>到期时间<input id="marketEditExpires" placeholder="YYYY-MM-DD HH:MM:SS" required></label></div>
+      <label>管理员备注<input id="marketEditNote" maxlength="500"></label>
+      <label>操作原因<span>必填，保存后写入独立审计记录</span><textarea id="marketEditReason" rows="3" maxlength="500" required></textarea></label>
+      <div id="marketEditResult" class="notice">这里只修改商品资料，不会直接改买卖双方功德或历史订单。</div>
+      <div class="toolbar"><button class="primary" type="submit">保存修改</button></div>
+    </form></div>
+
+    <div id="sysCmdModal" class="modal hidden"><div class="dialog wide-dialog form">
+      <div class="section-title"><div><p class="eyebrow">系统命令</p><h2 id="sysCmdTitle">编辑系统命令</h2></div><button type="button" id="closeSysCmdModal">关闭</button></div>
+      <div id="sysCmdTriggerFields"></div>
+      <div id="sysCmdTemplates"></div>
+      <div id="sysCmdNumbers"></div>
+      <div class="toolbar"><button id="saveSysCmd" class="primary">保存</button></div>
+    </div></div>
+
+    <div id="groupModal" class="modal hidden"><div class="dialog form">
+      <div class="section-title"><div><p class="eyebrow">分组管理</p><h2>管理分组</h2></div><button type="button" id="closeGroupModal">关闭</button></div>
+      <label>新建分组<input id="newGroupName" placeholder="输入分组名"></label>
+      <button id="createGroup" class="primary">创建分组</button>
+      <div class="section-title" style="margin-top:16px"><h3>已有分组</h3></div>
+      <div id="groupList" class="list empty">暂无分组。</div>
+    </div></div><section id="shop" class="page">
+      <header><p class="eyebrow">商品与库存</p><h1>神殿仓库</h1><p>商品、库存、掉落与兑换</p></header>
+      <div class="toolbar">
+        <button id="shopConfigBtn">仓库设置</button>
+        <button id="newImageShopItem">图片商品创建</button>
+        <button id="newShopItem" class="primary">新建商品</button>
+      </div>
+      <div id="shopList" class="panel table empty">暂无圣物。</div>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>随机掉落池</span><small>总概率、来源与掉落项目</small></summary>
+        <div class="section-title"><div><p class="eyebrow">随机收藏品</p><h2>随机掉落池</h2></div><button id="refreshItemEconomy" type="button">刷新</button></div>
+        <p class="note">先按总掉落概率判断是否触发；触发后再按物品权重抽取一种。普通聊天使用独立的 1% 等概率规则。</p>
+        <div class="checks"><label><input id="randomDropEnabled" type="checkbox"> 启用随机掉落</label></div>
+        <label>其他项目总掉落概率（%）<span>适用于签到、工资、游戏和付费互动等已勾选来源</span><input id="randomDropChance" type="number" min="0" max="100" step="0.1" value="20"></label>
+        <div class="checks">
+          <label><input class="drop-source" type="checkbox" value="checkin"> 签到</label><label><input class="drop-source" type="checkbox" value="wage"> 工资</label>
+          <label><input class="drop-source" type="checkbox" value="beg_success"> 乞讨成功</label><label><input class="drop-source" type="checkbox" value="game_win"> 游戏胜利</label>
+          <label><input class="drop-source" type="checkbox" value="game_loss"> 游戏落败</label><label><input class="drop-source" type="checkbox" value="six_seal_loss"> 裁决落败</label>
+          <label><input class="drop-source" type="checkbox" value="paid_interaction_payer"> 付费互动发起者</label>
+        </div>
+        <label>默认掉落提示<span>变量：{user} {item} {quantity} {newline}</span><input id="randomDropReply"></label>
+        <div class="toolbar"><button id="saveItemEconomy" class="primary" type="button">保存掉落总设置</button></div>
+        <div id="dropProbabilitySummary" class="notice">正在计算概率……</div>
+        <div id="dropPoolList" class="table">暂无掉落项目。</div>
+        <hr>
+        <input id="dropEntryId" type="hidden">
+        <div class="three"><label>掉落物品<select id="dropItemId"></select></label><label>触发后权重<input id="dropChance" type="number" min="0" max="100" step="0.1" value="10"></label><label>排序<input id="dropSort" type="number" value="0"></label></div>
+        <div class="three"><label>最少数量<input id="dropMinQuantity" type="number" min="1" value="1"></label><label>最多数量<input id="dropMaxQuantity" type="number" min="1" value="1"></label><label>独立提示（留空用默认）<input id="dropReplyTemplate"></label></div>
+        <div class="checks"><label><input id="dropEntryEnabled" type="checkbox" checked> 启用</label><label><input id="dropDeductStock" type="checkbox"> 扣减神殿商品库存</label></div>
+        <div class="toolbar"><button id="saveDropEntry" class="primary" type="button">保存掉落项目</button><button id="clearDropEntry" type="button">清空表单</button></div>
+      </details>
+
+      <details class="panel form settings-disclosure" style="margin-top:20px">
+        <summary><span>兑换仓库</span><small>兑换命令、规则、项目与记录</small></summary>
+        <div class="section-title"><div><p class="eyebrow">大祭司的魔法鸡鸡</p><h2>兑换仓库</h2></div></div>
+        <div class="checks"><label><input id="exchangeShopEnabled" type="checkbox"> 启用兑换仓库</label></div>
+        <div class="two"><label>查看命令<input id="exchangeShopCommands"></label><label>兑换命令<input id="exchangeCommands"></label></div>
+        <label>仓库标题<input id="exchangeShopHeader"></label><label>背景故事<textarea id="exchangeShopStory" rows="3"></textarea></label>
+        <label>底部提示<input id="exchangeShopFooter"></label>
+        <label>兑换成功模板<span>变量：{user} {offer} {costs} {rewards}</span><input id="exchangeSuccessReply"></label>
+        <label>材料不足模板<span>变量：{user} {missing_items}</span><input id="exchangeMissingReply"></label>
+        <div class="two"><label>每人一次上限提示<input id="exchangeLimitOnceReply"></label><label>每周上限提示<input id="exchangeLimitWeeklyReply"></label></div>
+        <div class="toolbar"><button id="saveExchangeSettings" class="primary" type="button">保存兑换仓库设置</button></div>
+        <hr>
+        <div class="section-title"><div><h3>兑换项目</h3><p class="note">每条规则可同时消耗多种物品，并发放功德点、物品、纪念勋章和永久称号。</p></div><button id="newExchangeOffer" type="button">新建项目</button></div>
+        <div id="exchangeOfferList" class="table">暂无兑换项目。</div>
+        <hr>
+        <div class="section-title"><div><h3>最近兑换记录</h3></div><button id="refreshExchangeHistory" type="button">刷新记录</button></div>
+        <div id="exchangeHistoryList" class="table">暂无兑换记录。</div>
+      </details>
+    </section>
+
+    <section id="ai-character" class="page">
+      <header><p class="eyebrow">智能角色</p><h1>AI角色</h1><p>管理角色资料、模型、收费、记忆、关系、主动聊天与调用记录。</p></header>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">运行总览</p><h2>当前状态</h2></div><button id="refreshAiCharacter" type="button">刷新</button></div>
+        <div id="aiOverview" class="stats"><div>正在读取运行状态。</div></div>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">角色资料</p><h2>身份与关系</h2></div></div>
+        <div class="three"><label>角色名称<input id="aiName"></label><label>角色种族<input id="aiSpecies"></label><label>自称<input id="aiSelfName"></label></div>
+        <label>角色身份<textarea id="aiIdentity" rows="3"></textarea></label>
+        <div class="two"><label>角色外形<textarea id="aiAppearance" rows="3"></textarea></label><label>角色来源<textarea id="aiOrigin" rows="3"></textarea></label></div>
+        <div class="two"><label>所在世界<input id="aiWorld"></label><label>与大祭司的关系<input id="aiCreatorRelation"></label></div>
+        <label>世界观<textarea id="aiWorldview" rows="3"></textarea></label>
+        <div class="three"><label>性格<input id="aiPersonality"></label><label>说话语气<input id="aiTone"></label><label>对大祭司的称呼<input id="aiCreatorTitle"></label></div>
+        <div class="three"><label>普通群友称呼<input id="aiMemberTitle"></label><label>幽默程度<input id="aiHumor"></label><label>调侃程度<select id="aiTeasing"><option>关闭</option><option>轻度</option><option>适中</option><option>较强</option></select></label></div>
+        <div class="three"><label>表情使用<select id="aiEmoji"><option>关闭</option><option>少量</option><option>适中</option><option>丰富</option></select></label><label>回复长度<select id="aiReplyLength"><option>简短</option><option>正常</option><option>详细</option></select></label><label>最多分段数<input id="aiMaxReplyMessages" type="number" min="1" max="8"></label></div>
+        <div class="four"><label class="switch"><input id="aiUseHeadings" type="checkbox"> 使用小标题</label><label class="switch"><input id="aiUseNumbering" type="checkbox"> 使用编号</label><label class="switch"><input id="aiArchiveStyle" type="checkbox"> 档案式盘点</label><label class="switch"><input id="aiImagination" type="checkbox"> 趣味发挥</label></div>
+        <label class="switch"><input id="aiInheritRelations" type="checkbox"> 继承大祭司人物关系</label>
+        <label>关系继承规则<span>JSON格式，只定义派生称呼，不修改正式契约</span><textarea id="aiRelationRules" rows="5"></textarea></label>
+        <div class="toolbar"><button id="saveAiProfile" class="primary" type="button">保存角色资料</button><button id="restoreAiProfilePrevious" type="button">恢复上一次</button><button id="restoreAiProfileDefault" type="button">恢复默认追追</button></div>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">最高级系统提示词</p><h2>角色扮演最高指令</h2></div></div>
+        <label>最高级提示词<span>最先注入模型；程序中的工具白名单、权限、确认、幂等和收费规则仍强制生效</span><textarea id="aiSupremeSystemPrompt" rows="14"></textarea></label>
+        <div class="toolbar"><button id="saveAiSupremeSystemPrompt" class="primary" type="button">保存最高级提示词</button><button id="restoreAiSupremeSystemPromptPrevious" type="button">恢复上一次</button><button id="restoreAiSupremeSystemPromptDefault" type="button">恢复默认</button></div>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">系统工作规则</p><h2>权限、工具与事实保护</h2></div></div>
+        <label>系统提示词<span>即使清空，程序中的工具白名单、管理员命令禁用、确认、幂等和收费规则仍强制生效</span><textarea id="aiSystemRules" rows="14"></textarea></label>
+        <div class="toolbar"><button id="saveAiSystemRules" class="primary" type="button">保存系统规则</button><button id="restoreAiSettingsPrevious" type="button">恢复上一次</button><button id="restoreAiSettingsDefault" type="button">恢复默认</button></div>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">角色人格设定</p><h2>完整人格提示词</h2></div></div>
+        <label>人格提示词<textarea id="aiPersonaPrompt" rows="14"></textarea></label>
+        <div class="toolbar"><button id="saveAiPersona" class="primary" type="button">保存人格设定</button><button id="restoreAiPersonaPrevious" type="button">恢复上一次</button><button id="restoreAiPersonaDefault" type="button">恢复默认</button><button id="testAiPersona" type="button">测试角色回复</button></div>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">模型设置</p><h2>DeepSeek 调用</h2></div></div>
+        <label class="switch"><input id="aiEnabled" type="checkbox"> 启用AI角色</label>
+        <div class="two"><label>主要模型<select id="aiPrimaryModel"><option value="deepseek-v4-flash">DeepSeek V4 Flash</option><option value="deepseek-v4-pro">DeepSeek V4 Pro</option></select></label><label>备用模型<select id="aiBackupModel"><option value="deepseek-v4-flash">DeepSeek V4 Flash</option><option value="deepseek-v4-pro">DeepSeek V4 Pro</option></select></label></div>
+        <div class="four"><label class="switch"><input id="aiNormalThinking" type="checkbox"> 普通请求默认思考</label><label class="switch"><input id="aiAllowThinking" type="checkbox"> 允许/zzs</label><label class="switch"><input id="aiFallbackModel" type="checkbox"> 失败切换备用</label><label class="switch"><input id="aiFallbackNormal" type="checkbox"> 思考失败降级</label></div>
+        <div class="two"><label>普通超时（秒）<input id="aiNormalTimeout" type="number" min="3"></label><label>思考超时（秒）<input id="aiThinkingTimeout" type="number" min="3"></label></div>
+        <div class="toolbar"><button id="saveAiModel" class="primary" type="button">保存模型设置</button><button class="aiModelTest" data-target="primary" data-thinking="false" type="button">测试主要普通模式</button><button class="aiModelTest" data-target="primary" data-thinking="true" type="button">测试主要思考模式</button><button class="aiModelTest" data-target="backup" data-thinking="false" type="button">测试备用模型</button></div>
+        <pre id="aiModelResult" class="result">尚未测试。</pre>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">AI收费与用量</p><h2>服务费与Token尾注</h2></div></div>
+        <div class="four"><label>普通请求总费用<input id="aiNormalFee" type="number" min="0"></label><label>思考请求总费用<input id="aiThinkingFee" type="number" min="0"></label><label>大祭司每次抽成<input id="aiRecipientFee" type="number" min="0"></label><label>免费用户主页ID<span>每行一个</span><textarea id="aiFreeUsers" rows="3"></textarea></label></div>
+        <label>服务费收款用户主页ID<span>默认转入大祭司账户；保存时会验证账户是否存在</span><input id="aiFeeRecipientUserId"></label>
+        <div class="four"><label class="switch"><input id="aiFeeEnabled" type="checkbox"> AI收费总开关</label><label class="switch"><input id="aiAllowInsufficient" type="checkbox"> 功德不足可使用</label><label class="switch"><input id="aiAllowNegative" type="checkbox"> 允许扣至负数（最低 -100）</label><label class="switch"><input id="aiAdminFree" type="checkbox"> 管理员免收</label></div>
+        <label class="switch"><input id="aiTokenFooter" type="checkbox"> 显示Token和功德尾注</label>
+        <label>尾注格式<span>变量：{token_text}、{fee}</span><input id="aiTokenFooterFormat"></label>
+        <div class="toolbar"><button id="saveAiFees" class="primary" type="button">保存收费设置</button></div>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">上下文与记忆</p><h2>加载和后台更新</h2></div></div>
+        <div class="four"><label>近期群消息数<input id="aiRecentGroup" type="number" min="1"></label><label>近期用户消息数<input id="aiRecentUser" type="number" min="1"></label><label>普通工具上限<input id="aiNormalTools" type="number" min="0"></label><label>思考工具上限<input id="aiThinkingTools" type="number" min="0"></label></div>
+        <div class="four"><label>会话原文轮数<input id="aiRawTurns" type="number" min="1"></label><label>会话摘要长度<input id="aiConversationSummary" type="number" min="200"></label><label>上下文最大字符<input id="aiContextMax" type="number" min="2000"></label><label>相关人物上限<input id="aiRelatedUsers" type="number" min="1"></label></div>
+        <div class="four"><label>普通并发数<input id="aiNormalConcurrency" type="number" min="1"></label><label>思考并发数<input id="aiThinkingConcurrency" type="number" min="1"></label><label>每用户排队上限<input id="aiUserQueue" type="number" min="1"></label><label>每群排队上限<input id="aiGroupQueue" type="number" min="1"></label></div>
+        <div class="two"><label>排队等待上限（秒）<input id="aiQueueWait" type="number" min="1"></label><label>后台摘要并发数<input id="aiBackgroundConcurrency" type="number" min="1"></label></div>
+        <div class="four"><label class="switch"><input id="aiMemoryEnabled" type="checkbox"> 人物记忆</label><label>消息触发数量<input id="aiMemoryThreshold" type="number" min="1"></label><label>人物摘要最大长度<input id="aiMemoryChars" type="number" min="100"></label><label>事件保留数量<input id="aiEventLimit" type="number" min="1"></label></div>
+        <div class="two"><label class="switch"><input id="aiGroupMemoryEnabled" type="checkbox"> 群记忆每小时检查</label><label>群记忆最少新消息<input id="aiGroupMemoryMin" type="number" min="1"></label></div>
+        <div id="aiGroupMemoryStatus" class="note">群记忆状态尚未读取。</div>
+        <div class="toolbar"><button id="saveAiContext" class="primary" type="button">保存上下文与记忆</button><button id="regenerateAiGroupMemory" type="button">重新生成群摘要</button></div>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">主动聊天</p><h2>低频参与</h2></div></div>
+        <label class="switch"><input id="aiProactiveEnabled" type="checkbox"> 启用主动聊天</label>
+        <div class="four"><label class="switch"><input id="aiProactiveMain" type="checkbox"> 主群启用</label><label class="switch"><input id="aiProactiveBounty" type="checkbox"> 悬赏群启用</label><label>主动聊天模型<select id="aiProactiveModel"><option value="primary">主要模型</option><option value="backup">备用模型</option></select></label><label class="switch"><input id="aiProactiveThinking" type="checkbox"> 使用思考模式</label></div>
+        <div class="four"><label>发送间隔<input type="text" value="10-15分钟（按电脑时间）" readonly></label><label>最大字数<input id="aiProactiveChars" type="number" min="50"></label></div>
+        <div class="four"><label>安静开始<input id="aiQuietStart" type="time"></label><label>安静结束<input id="aiQuietEnd" type="time"></label><label class="switch"><input id="aiProactiveRp" type="checkbox"> RP期间参与</label><label class="switch"><input id="aiProactiveGames" type="checkbox"> 游戏期间参与</label></div>
+        <label class="switch"><input id="aiProactiveToken" type="checkbox"> 主动聊天显示Token用量</label>
+        <div class="toolbar"><button id="saveAiProactive" class="primary" type="button">保存主动聊天设置</button></div>
+      </section>
+      <section class="panel">
+        <div class="section-title"><div><p class="eyebrow">人物关系与功能能力</p><h2>程序接入状态</h2></div></div>
+        <div class="four"><label>群<input id="aiRelationGroup" value="main"></label><label>主体主页ID<input id="aiRelationSubject"></label><label>正向关系<input id="aiRelationForward"></label><label>对象主页ID<input id="aiRelationObject"></label></div>
+        <div class="three"><label>反向关系<input id="aiRelationReverse"></label><label>管理员说明<input id="aiRelationNote"></label><label class="switch"><input id="aiRelationInheritance" type="checkbox" checked> 允许角色继承</label></div>
+        <div class="toolbar"><button id="createAiRelationship" class="primary" type="button">新增确认关系</button></div>
+        <div id="aiRelationships" class="table">暂无关系记录。</div>
+        <div id="aiCapabilities" class="table">正在读取能力注册表。</div>
+      </section>
+      <section class="panel form">
+        <div class="section-title"><div><p class="eyebrow">重要事件</p><h2>手动事件卡</h2></div></div>
+        <div class="four"><label>群<input id="aiEventGroup" value="main"></label><label>用户主页ID<input id="aiEventUser"></label><label>事件类型<input id="aiEventType" value="管理员记录"></label><label>重要程度<input id="aiEventImportance" type="number" min="1" max="5" value="3"></label></div>
+        <label>事件摘要<textarea id="aiEventSummary" rows="3"></textarea></label>
+        <div class="two"><label>来源消息ID<input id="aiEventMessageId"></label><label class="switch"><input id="aiEventTease" type="checkbox"> 允许翻旧账调侃</label></div>
+        <div class="toolbar"><button id="createAiEvent" class="primary" type="button">新增事件卡</button></div>
+        <div id="aiEvents" class="table">暂无事件卡。</div>
+      </section>
+      <section class="panel">
+        <div class="section-title"><div><p class="eyebrow">确认操作与日志</p><h2>近期任务</h2></div></div>
+        <div id="aiPendingActions" class="table">暂无待确认操作。</div>
+        <div id="aiTaskList" class="table">暂无AI任务。</div>
+        <pre id="aiTaskDetail" class="result">选择任务后查看模型消息与工具调用明细。</pre>
+      </section>
+    </section>
+
+    <section id="users" class="page">
+      <header><p class="eyebrow">用户档案</p><h1>用户数据</h1><p>搜索用户并查看账户、背包与记录</p></header>
+      <div class="toolbar"><input id="userSearch" placeholder="搜索用户（昵称/自定义称呼/主页ID）" style="max-width:300px"><select id="identityStatusFilter"><option value="">全部用户</option><option value="nickname_conflict">昵称冲突用户</option></select><button id="cleanupUsers">清理无效条目</button><button id="refreshUsers">刷新</button></div>
+      <div id="userList" class="panel table empty">暂无用户数据。</div>
+    </section>
+
+    <section id="messages" class="page">
+      <header><p class="eyebrow">实时监控</p><h1>消息监控</h1><p>群消息、命令命中与处理结果</p></header>
+      <div class="toolbar monitor-toolbar">
+        <input id="messageSearch" placeholder="搜索消息或回复">
+        <input id="messageSender" placeholder="筛选用户">
+        <select id="messageCommandFilter"><option value="all">全部命令状态</option><option value="matched">已命中命令</option><option value="unmatched">未命中命令</option></select>
+        <select id="messageProcessFilter"><option value="all">全部处理状态</option><option value="processed">已处理</option><option value="pending">未处理</option></select>
+        <label class="auto-scroll"><input id="messageAutoScroll" type="checkbox"> 自动滚动</label>
+        <button id="refreshMessages" type="button">刷新</button>
+      </div>
+      <div id="messageList" class="panel list empty">暂未读取到群聊消息。</div>
+    </section>
+
+    <section id="logs" class="page">
+      <header><p class="eyebrow">系统记录</p><h1>日志中心</h1><p>运行、发送与错误记录</p></header>
+      <div class="toolbar monitor-toolbar"><input id="logSearch" placeholder="搜索日志内容"><select id="logLevel"><option value="all">全部级别</option><option value="info">信息</option><option value="warning">警告</option><option value="error">错误</option></select><select id="logKind"><option value="all">全部来源</option><option value="normal">普通</option><option value="error">错误</option><option value="send">发送</option><option value="rule">命令</option></select><label class="auto-scroll"><input id="logAutoScroll" type="checkbox"> 自动滚动</label><button id="refreshLogs">刷新</button><button id="clearLogs" class="danger">清空日志</button></div>
+      <div id="logList" class="panel list empty">暂无日志。</div>
+    </section>
+
+    <section id="safety" class="page">
+      <header><p class="eyebrow">风险控制</p><h1>安全设置</h1><p>回复频率与游戏次数限制</p></header>
+      <div class="danger-zone safety-emergency">
+        <div><svg class="nav-icon" aria-hidden="true"><use href="#icon-alert"></use></svg><strong>紧急停止</strong><span>机器人出现连续异常回复时立即暂停全部自动处理。</span></div>
+        <button id="emergencyStop" class="danger" type="button">紧急停止机器人</button>
+      </div>
+      <details class="panel form settings-disclosure" style="margin-bottom:20px">
+        <summary><span>回复安全限制</span><small>每分钟、每小时与全局冷却</small></summary>
+        <div class="section-title"><div><h2>回复安全限制</h2></div><label class="switch" style="margin:0"><input id="safeEnabled" type="checkbox"><span>启用</span></label></div>
+        <p class="note" style="margin:4px 0 12px">控制机器人在群里的回复频率，防止刷屏。</p>
+        <div class="three"><label>每分钟上限<span>每分钟最多回复条数</span><input id="maxMinute" type="number" min="1"></label><label>每小时上限<span>每小时最多回复条数</span><input id="maxHour" type="number" min="1"></label><label>全局冷却（秒）<span>两次回复之间的最小间隔</span><input id="globalCooldown" type="number" min="0"></label></div>
+      </details>
+      <details class="panel form settings-disclosure" style="margin-bottom:20px">
+        <summary><span>塔罗牌安全设置</span><small>每人每日占卜次数</small></summary>
+        <div class="section-title"><div><h2>塔罗牌次数限制</h2></div></div>
+        <p class="note" style="margin:4px 0 12px">只有成功完成并结算的塔罗牌占卜才计次，每日 00:00 自动刷新。</p>
+        <label>每人每日可测次数<span>可设置 1～100 次</span><input id="tarotDailyLimitSafety" type="number" min="1" max="100" step="1" value="1"></label>
+      </details>
+      <details class="panel form settings-disclosure">
+        <summary><span>游戏安全设置</span><small>开放时段与每日次数限制</small></summary>
+        <div class="section-title"><div><h2>游戏安全设置</h2></div><label class="switch" style="margin:0"><input id="gameLimitEnabled" type="checkbox"><span>启用</span></label></div>
+        <p class="note" style="margin:4px 0 12px">限制每位玩家每天发起游戏的次数，并控制游戏开放时段。每日 00:00 自动刷新。</p>
+        <label>开放时间段<span>多个时间段用逗号分隔，例如：08:00-10:00,14:00-17:00</span><input id="gameOpenWindows" value="08:00-10:00,14:00-17:00"></label>
+        <div class="four"><label>纸牌试炼每日上限<span>修女纸牌单人试炼次数</span><input id="gameDailySystemLimit" type="number" min="0" value="3"></label><label>群纸牌试炼每日上限<span>发起群纸牌试炼次数，不限制加入次数</span><input id="gameDailyBattleLimit" type="number" min="0" value="1"></label><label>裁决每日发起上限<span>每人每天仅限制发起，加入次数不限</span><input id="gameDailySixSealLimit" type="number" min="0" value="2"></label><label>猜乳头每日上限<span>按完成的游戏局数统计</span><input id="gameDailyNippleGuessLimit" type="number" min="0" value="3"></label><label>曦曦盲盒每日上限<span>只统计成功结算的开盒次数</span><input id="gameDailyBlindBoxLimit" type="number" min="0" value="3"></label></div>
+        <label>非开放时间提示<span>变量：{user}=用户 {open_windows}=开放时间 {currency}=货币名</span><input id="gameClosedReply" value="{user}，当前不在游戏开放时间。开放时间：{open_windows}。"></label>
+        <label>每日次数上限提示<span>变量：{user}=用户 {played}=已发起次数 {max_plays}=上限 {game_kind}=游戏类型 {open_windows}=开放时间 {currency}=货币名</span><input id="gameLimitReply" value="{user}，你今天已发起 {played} 次{game_kind}（上限 {max_plays} 次），请明天 00:00 后再来。"></label>
+      </details>
+      <div class="toolbar" style="margin-top:20px"><button id="saveSafety" class="primary">保存安全设置</button></div>
+    </section>
+
+    <section id="help" class="page">
+      <header><p class="eyebrow">新手指南</p><h1>使用帮助</h1><p>第一次使用按顺序完成下面5步；日常管理可直接查看对应功能入口。</p></header>
+
+      <section class="panel help help-start">
+        <div class="section-title">
+          <div><p class="eyebrow">首次启动</p><h2>5步完成机器人连接</h2></div>
+          <button type="button" onclick="showPage('connect')">前往连接设置</button>
+        </div>
+        <div class="help-steps">
+          <article><b>1</b><div><strong>打开程序</strong><p>双击“DZMM群聊机器人.exe”，等待左下角显示“服务与浏览器在线”。</p></div></article>
+          <article><b>2</b><div><strong>登录 DZMM</strong><p>进入“连接设置”，点击“打开 DZMM”，在机器人专用浏览器中完成登录。</p></div></article>
+          <article><b>3</b><div><strong>绑定目标群聊</strong><p>打开需要管理的群聊，填写群聊 URL 并保存连接设置。</p></div></article>
+          <article><b>4</b><div><strong>确认可以读取</strong><p>依次点击“识别页面”和“测试读取”，确认仪表盘显示已连接、已登录。</p></div></article>
+          <article><b>5</b><div><strong>启动机器人</strong><p>返回仪表盘点击“恢复机器人”。状态显示“运行中”后，机器人开始响应群命令。</p></div></article>
+        </div>
+      </section>
+
+      <div class="help-grid">
+        <section class="panel help-card">
+          <p class="eyebrow">日常操作</p><h2>运行、暂停与排查</h2>
+          <dl>
+            <div><dt>仪表盘</dt><dd>查看连接、登录、机器人状态和最近日志；可发送快速测试消息。</dd></div>
+            <div><dt>暂停</dt><dd>临时停止自动回复，但程序仍保持打开。</dd></div>
+            <div><dt>恢复机器人</dt><dd>让机器人重新读取消息并处理群命令。</dd></div>
+            <div><dt>紧急停止</dt><dd>出现连续异常回复时立即使用，再到日志中心查看原因。</dd></div>
+          </dl>
+          <div class="help-actions"><button type="button" onclick="showPage('dashboard')">打开仪表盘</button><button type="button" onclick="showPage('logs')">查看日志</button></div>
+        </section>
+
+        <section class="panel help-card">
+          <p class="eyebrow">功能入口</p><h2>想修改什么，就去哪里</h2>
+          <dl>
+            <div><dt>命令管理</dt><dd>修改系统命令触发词、回复文案，创建和分组自定义命令。</dd></div>
+            <div><dt>游戏命令</dt><dd>设置纸牌游戏的触发词、回复和每日次数。</dd></div>
+            <div><dt>神殿仓库</dt><dd>管理商品、库存、图片商品、物品状态和使用回复。</dd></div>
+            <div><dt>用户数据</dt><dd>查看功德点、身份状态、背包、昵称和用户资料。</dd></div>
+            <div><dt>工资发放</dt><dd>在仪表盘设置工资规则；用户当天发送 /领取工资，领取昨天工资。</dd></div>
+          </dl>
+          <div class="help-actions"><button type="button" onclick="showPage('commands')">管理命令</button><button type="button" onclick="showPage('shop')">管理商品</button></div>
+        </section>
+
+        <section class="panel help-card">
+          <p class="eyebrow">常见问题</p><h2>功能没有反应时</h2>
+          <ol class="help-checklist">
+            <li>确认仪表盘显示“机器人运行中、浏览器已连接、账号已登录”。</li>
+            <li>确认消息以半角斜杠“/”开头，并使用后台配置中的完整触发词。</li>
+            <li>系统命令和自定义命令自动兼容繁体字，例如“/领取工资”和“/領取工資”效果相同，无需重复配置。</li>
+            <li>点击“测试读取”，检查机器人是否能读取当前群聊。</li>
+            <li>到“日志中心”查看错误；连续异常回复时先使用“紧急停止”。</li>
+            <li>工资和活跃统计只记录程序运行期间读取到的群消息，未开机的日期不会补记。</li>
+          </ol>
+        </section>
+
+        <section class="panel help-card">
+          <p class="eyebrow">备份与迁移</p><h2>换电脑时不要漏数据</h2>
+          <p>关闭程序后，复制整个“DZMMBot-Portable”文件夹到新电脑即可。不要只复制 EXE，否则用户资料和设置不会一起过去。</p>
+          <dl>
+            <div><dt>data/bot.db</dt><dd>用户、功德点、背包、商品、命令和业务记录。</dd></div>
+            <div><dt>data/config.json</dt><dd>机器人连接与功能设置。</dd></div>
+            <div><dt>data/browser_profile</dt><dd>DZMM 登录状态；换电脑后失效时重新登录即可。</dd></div>
+          </dl>
+          <p class="note">备份前先关闭程序，避免数据库正在写入时复制出不完整文件。</p>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="guide" class="modal hidden"><div class="dialog"><h2>欢迎使用 DZMM Bot</h2><p>先登录 DZMM，填写群聊 URL，测试读取，再启用机器人。</p><div class="toolbar"><button id="startConfig" class="primary">开始配置</button><button id="showHelp">查看教程</button><button id="hideGuide">下次不再提示</button></div></div></div>
+
+  <div id="dangerConfirmModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dangerConfirmTitle">
+    <div class="dialog danger-confirm-dialog">
+      <div class="section-title"><div><p class="eyebrow">危险操作确认</p><h2 id="dangerConfirmTitle">确认执行</h2></div></div>
+      <div class="danger-confirm-body">
+        <dl>
+          <div><dt>操作对象</dt><dd id="dangerConfirmTarget">当前项目</dd></div>
+          <div><dt>影响范围</dt><dd id="dangerConfirmImpact">请确认操作影响。</dd></div>
+          <div><dt>恢复方式</dt><dd id="dangerConfirmRecovery">请查看备份与恢复说明。</dd></div>
+        </dl>
+      </div>
+      <div class="modal-actions"><button id="dangerConfirmCancel" type="button">取消</button><button id="dangerConfirmSubmit" class="danger" type="button">确认执行</button></div>
+    </div>
+  </div>
+
+  <div id="ruleModal" class="modal hidden"><form id="ruleForm" class="dialog wide-dialog form">
+    <div class="section-title"><div><p class="eyebrow">命令编辑器</p><h2 id="ruleModalTitle">新建命令</h2></div><button type="button" id="closeRuleModal">关闭</button></div>
+    <input type="hidden" id="ruleId">
+    <input type="hidden" id="ruleGroupName">
+    <div class="two"><label>命令名称<input id="ruleName" required></label><label>命令触发词<input id="triggerValue" placeholder="/菜单，/帮助，/教程" required></label></div>
+    <label>回复内容<textarea id="replyContent" required></textarea></label>
+    <div class="three"><label>优先级<input id="rulePriority" type="number" value="0"></label><label>回复模式<select id="replyMode"></select></label><label>每日上限<input id="dailyMax" type="number" min="0" value="0"></label></div>
+    <div class="two"><label>用户冷却（秒）<input id="userCooldown" type="number" min="0" value="0"></label><label>备注<input id="ruleNote"></label></div>
+    <div class="checks"><label><input id="ruleEnabled" type="checkbox" checked> 启用</label><label><input id="requireAdmin" type="checkbox"> 管理员专用</label></div>
+    <div class="toolbar"><button class="primary" type="submit">保存命令</button><button type="button" id="cancelRule">清空</button></div>
+  </form></div>
+
+  <div id="userModal" class="modal hidden"><div class="dialog wide-dialog"><div class="section-title"><div><p class="eyebrow">用户档案</p><h2 id="userModalTitle">用户详情</h2></div><button id="closeUserModal">关闭</button></div><div id="userDetail"></div></div></div>
+
+  <div id="exchangeOfferModal" class="modal hidden"><div class="dialog wide-dialog form">
+    <div class="section-title"><div><p class="eyebrow">兑换商品编辑器</p><h2 id="exchangeOfferModalTitle">新建兑换商品</h2></div><button type="button" id="closeExchangeOfferModal">关闭</button></div>
+    <input id="exchangeOfferId" type="hidden"><input id="exchangeOfferCode" type="hidden">
+    <div class="three"><label>项目名称<input id="exchangeOfferName"></label><label>限制方式<select id="exchangeLimitType"><option value="weekly">每周次数</option><option value="once">每人仅限一次</option></select></label><label>每周次数<input id="exchangeWeeklyLimit" type="number" min="1" max="999" value="1"></label></div>
+    <div class="two"><label>说明<input id="exchangeOfferDescription"></label><label>排序<input id="exchangeOfferSort" type="number" value="0"></label></div>
+    <div class="checks"><label><input id="exchangeOfferEnabled" type="checkbox" checked> 启用项目</label></div>
+    <label>独立成功提示（留空使用仓库模板）<input id="exchangeOfferSuccessReply"></label>
+    <div class="section-title"><h3>所需材料</h3><button id="addExchangeCost" type="button">添加材料</button></div><div id="exchangeCostRows"></div>
+    <div class="section-title"><h3>兑换奖励</h3><button id="addExchangeReward" type="button">添加奖励</button></div><div id="exchangeRewardRows"></div>
+    <div class="toolbar"><button id="saveExchangeOffer" class="primary" type="button">保存兑换商品</button><button id="cancelExchangeOffer" type="button">取消</button></div>
+  </div></div>
+
+  <div id="commissionDemandModal" class="modal hidden"><form id="commissionDemandForm" class="dialog wide-dialog form">
+    <div class="section-title"><div><p class="eyebrow">需求独立编辑器</p><h2 id="commissionDemandModalTitle">编辑需求</h2></div><button id="closeCommissionDemandModal" type="button">关闭</button></div>
+    <input id="commissionDemandId" type="hidden">
+    <label>需求标题<input id="commissionDemandTitle" required></label>
+    <label>需求内容<textarea id="commissionDemandContent" rows="5" required></textarea></label>
+    <div class="four">
+      <label>需求人数<input id="commissionDemandPeople" type="number" min="1" max="10" required></label>
+      <label>每人奖励<input id="commissionDemandReward" type="number" min="1" required></label>
+      <label>招募截止时间<input id="commissionDemandExpiry"></label>
+      <label>状态<select id="commissionDemandStatus"><option value="recruiting">招募中</option><option value="filled">名额已满</option><option value="completed">已完成</option><option value="closed">已关闭</option></select></label>
+    </div>
+    <label>管理员修改原因<span>必填；资金变化会自动补扣或退回发布者并写入审计。</span><input id="commissionDemandReason" required></label>
+    <div class="toolbar"><button class="primary" type="submit">保存需求</button><button id="cancelCommissionDemandEdit" type="button">取消</button></div>
+  </form></div>
+
+  <div id="commissionServiceModal" class="modal hidden"><form id="commissionServiceForm" class="dialog wide-dialog form">
+    <div class="section-title"><div><p class="eyebrow">服务独立编辑器</p><h2 id="commissionServiceModalTitle">编辑服务</h2></div><button id="closeCommissionServiceModal" type="button">关闭</button></div>
+    <input id="commissionServiceId" type="hidden">
+    <label>服务名称<input id="commissionServiceTitle" required></label>
+    <label>服务说明<textarea id="commissionServiceDescription" rows="5" required></textarea></label>
+    <div class="four">
+      <label>单价<input id="commissionServicePrice" type="number" min="1" required></label>
+      <label>计价单位<input id="commissionServiceUnit" maxlength="8"></label>
+      <label>库存模式<select id="commissionServiceStockMode"><option value="limited">有限库存</option><option value="unlimited">不限库存</option></select></label>
+      <label>总库存<input id="commissionServiceStockTotal" type="number" min="0" max="999"></label>
+      <label>剩余库存<input id="commissionServiceStockRemaining" type="number" min="0" max="999"></label>
+      <label>上架截止时间<input id="commissionServiceExpiry"></label>
+      <label>卖家抽成（%）<input id="commissionServiceFee" type="number" min="0" max="100"></label>
+      <label>状态<select id="commissionServiceStatus"><option value="on_sale">在售</option><option value="sold_out">售罄</option><option value="expired">已到期</option><option value="off_shelf">已下架</option></select></label>
+    </div>
+    <label>管理员修改原因<span>必填；修改不会篡改已经生成订单中的价格与服务快照。</span><input id="commissionServiceReason" required></label>
+    <div class="toolbar"><button class="primary" type="submit">保存服务</button><button id="cancelCommissionServiceEdit" type="button">取消</button></div>
+  </form></div>
+
+  <script src="/static/app.js?v=commission-house-v2-20260826"></script>
+
+  <div id="shopItemModal" class="modal hidden"><form id="shopItemForm" class="dialog wide-dialog form">
+    <div class="section-title"><div><p class="eyebrow">商品编辑器</p><h2 id="shopItemModalTitle">新建商品</h2></div><button type="button" id="closeShopItemModal">关闭</button></div>
+    <input type="hidden" id="shopItemId">
+    <input type="hidden" id="shopSpecialKind">
+    <label>商品名称<input id="shopName" required></label>
+    <label>商品说明<input id="shopDescription"></label>
+    <label>商品分类<select id="shopItemCategory"><option value="normal">普通商品</option><option value="special">特殊商品</option><option value="image">图片商品</option><option value="drop">掉落物品</option></select><span>掉落物品只用于掉落或游戏奖励，不进入正式商店，也不需要上架。</span></label>
+    <div id="shopSaleFields"><div class="three"><label>价格<input id="shopPrice" type="number" min="0" value="10"></label><label>库存<input id="shopStock" type="number" value="-1"></label><label>排序<input id="shopSort" type="number" value="0"></label></div>
+    <label class="switch"><input id="shopItemEnabled" type="checkbox" checked> 上架商品</label></div>
+    <label class="switch"><input id="shopUseEnabled" type="checkbox" checked> 允许使用</label>
+    <div id="shopUseFields">
+      <label>使用对象<select id="shopUseTarget"><option value="other">对他人使用</option><option value="self">对自己使用</option><option value="direct">直接使用</option></select></label>
+      <div id="shopUseOtherFields">
+        <label>对他人使用回复模板<span>变量：{actor}使用者 {target}目标 {item}商品名</span><textarea id="shopUseReplyTemplate">{actor}对{target}使用了{item}。</textarea></label>
+        <label>对他人状态显示<span>目标查看 /我的状态 时显示</span><input id="shopStatusTemplate" value="被{actor}使用了{item}"></label>
+      </div>
+      <div id="shopUseDirectFields" style="display:none"><label>直接使用回复模板<span>变量：{actor}使用者 {item}商品名</span><textarea id="shopDirectUseReplyTemplate">{actor}使用了{item}。</textarea></label></div>
+      <div id="shopUseSelfFields" style="display:none">
+        <label>对自己使用回复模板<span>变量：{actor}使用者 {item}商品名</span><textarea id="shopSelfUseReplyTemplate">{actor}使用了{item}。</textarea></label>
+        <label>对自己状态显示<span>自己查看 /我的状态 时显示</span><input id="shopSelfStatusTemplate" value="使用了{item}"></label>
+      </div>
+    </div>
+    <div id="shopImageFields" class="panel" style="display:none">
+      <label>图库文件夹<span>支持 JPG、PNG、WebP、GIF；每次使用时随机选择一张。</span></label>
+      <div class="toolbar"><input id="shopImageFolder" placeholder="请选择本机图库文件夹" style="flex:1"><button type="button" id="chooseShopImageFolder">选择文件夹</button></div>
+    </div>
+    <label id="shopRemovePriceField">解除状态价格<span>其他人解除该状态需要的功德点</span><input id="shopRemovePrice" type="number" min="0" value="5"></label>
+    <div class="toolbar"><button class="primary" type="submit">保存商品</button><button type="button" id="cancelShopItem">取消</button></div>
+  </form></div>
+  <div id="shopConfigModal" class="modal hidden"><div class="dialog wide-dialog form">
+    <div class="section-title"><div><p class="eyebrow">仓库设置</p><h2>神殿仓库命令设置</h2></div><button type="button" id="closeShopConfigModal">关闭</button></div>
+    <label>仓库命令触发词<span>多个用英文逗号分隔。</span><input id="shopTriggerWords" value="/神殿仓库,/商店,/shop"></label>
+    <label>仓库标题<span>/神殿仓库 命令的第一行。</span><input id="shopConfigHeader" value="⛪ 神殿仓库现有圣物："></label>
+    <label>仓库为空回复<input id="shopConfigEmptyReply" value="神殿仓库空空如也。"></label>
+    <label>圣物行模板<span>变量：{number}序号 {item}圣物名 {price}功德点 {stock}存量 {description}说明 {currency}货币名</span><input id="shopConfigItemLine" value="{number}. {item}：{price} {currency}，存量 {stock}{description}"></label>
+    <label>仓库底部提示<input id="shopConfigFooter" value="发送 /购买编号 领取圣物，例如 /购买1。"></label>
+    <div class="toolbar"><button id="saveShopConfig" class="primary">保存</button></div>
+  </div></div>  <div id="gameModal" class="modal hidden"><div class="dialog wide-dialog form">
+    <div class="section-title"><div><p class="eyebrow">游戏设置</p><h2 id="gameModalTitle">编辑游戏命令</h2></div><button type="button" id="closeGameModal">关闭</button></div>
+    <div id="gameModalContent"></div>
+    <div class="toolbar"><button id="saveGameCmd" class="primary">保存</button></div>
+  </div></div>
+
+</body>
+</html>

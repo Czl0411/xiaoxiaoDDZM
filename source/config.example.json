@@ -1,0 +1,59 @@
+{
+  "dzmm": {
+    "home_url": "https://www.ainvmei.com",
+    "group_url": "",
+    "scan_interval_seconds": 2,
+    "send_delay_seconds": 1.5,
+    "headless": false,
+    "auto_open_group": false,
+    "lock_group_urls": false,
+    "bot_enabled": false,
+    "only_current_group": true,
+    "allow_multi_rule_reply": false,
+    "require_slash_prefix": true,
+    "unknown_command_reply": "命令错误"
+  },
+  "selectors": {
+    "message_list": "",
+    "message_item": "",
+    "sender": "",
+    "message_text": "",
+    "message_time": "",
+    "self_message": "",
+    "input_box": "",
+    "send_button": ""
+  },
+  "safety": {
+    "enabled": true,
+    "max_replies_per_minute": 10,
+    "max_replies_per_hour": 100,
+    "ignore_self_messages": true,
+    "global_cooldown_seconds": 2,
+    "night_silence_enabled": false,
+    "night_silence_start": "23:00",
+    "night_silence_end": "08:00",
+    "blacklist_names": [],
+    "whitelist_names": [],
+    "admin_names": []
+  },
+  "ui": {
+    "hide_guide": false,
+    "auto_open_manager": true
+  },
+  "features": {
+    "currency_name": "功德点",
+    "checkin_enabled": true,
+    "checkin_base_reward": 10,
+    "checkin_streak_bonus": 1,
+    "checkin_streak_bonus_cap": 20,
+    "checkin_reply": "⛪ {user} 完成今日祈福！连续祈福 {streak} 天，获得 {reward} {currency}，当前共有 {balance} {currency}。",
+    "checkin_repeat_reply": "🕯️ {user}，你今天已经祈福过了。连续祈福 {streak} 天，当前共有 {balance} {currency}。",
+    "shop_enabled": true,
+    "shop_empty_reply": "神殿仓库空空如也。",
+    "inventory_empty_reply": "{user}，你的背包是空的。",
+    "purchase_success_reply": "{user}，购买成功：{item}，花费 {price} {currency}，余额 {balance} {currency}。",
+    "purchase_no_item_reply": "没有找到这个商品。",
+    "purchase_no_stock_reply": "这个商品库存不足。",
+    "purchase_no_money_reply": "{user}，你的 {currency} 不够，还差 {missing}。"
+  }
+}

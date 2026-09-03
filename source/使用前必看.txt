@@ -1,0 +1,20 @@
+使用前请先看这里
+
+1. 必须先解压整个文件夹，不要在压缩包预览窗口里直接双击 start.bat。
+
+2. with-python 完整包已经内置 Python，不需要另外安装 Python。
+   如果你拿到的是不带 runtime 文件夹的精简包，才需要自己安装 Python 3.11+。
+
+3. 正常启动：
+   双击 start.bat
+
+4. 如果双击没有反应：
+   双击 start_debug.bat
+   或查看：
+   data\logs\startup.log
+   data\logs\service-error.log
+
+5. 这套程序不需要安装 Google Chrome。
+   包里已经带了 Playwright 自带的 Chromium 浏览器。
+
+6. 第一次打开后，需要在管理界面点击“打开 DZMM”，然后登录自己的 DZMM 账号。
