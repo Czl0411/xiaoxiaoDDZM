@@ -1,0 +1,76 @@
+name: Build Windows releases
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}\ms-playwright
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: source/requirements.txt
+
+      - name: Install Python dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r source/requirements.txt pyinstaller
+
+      - name: Install Playwright Chromium
+        shell: pwsh
+        run: python -m playwright install chromium
+
+      - name: Create public empty secret payload
+        shell: pwsh
+        run: |
+          Set-Content -LiteralPath source/app/_embedded_secret_payload.py -Encoding UTF8 -Value 'DEEPSEEK_SECRET_BLOB = ""'
+
+      - name: Run release tests
+        shell: pwsh
+        run: python -m pytest -q source/tests/test_release_packaging.py source/tests/test_export_current_data.py source/tests/test_runtime_asset_paths.py
+
+      - name: Build with PyInstaller
+        shell: pwsh
+        working-directory: source
+        run: python -m PyInstaller --clean --noconfirm DZMMBot.spec
+
+      - name: Assemble portable ZIP
+        shell: pwsh
+        run: powershell -ExecutionPolicy Bypass -File source/scripts/assemble_windows_release.ps1 -ProjectRoot "${{ github.workspace }}"
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Build Setup.exe
+        shell: pwsh
+        run: iscc installer/DZMMBot.iss
+
+      - name: Upload portable ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: DZMMBot-Portable-win64
+          path: release/DZMMBot-Portable-win64.zip
+          if-no-files-found: error
+
+      - name: Upload Setup.exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: DZMMBot-Setup-win64
+          path: release/DZMMBot-Setup-win64.exe
+          if-no-files-found: error
