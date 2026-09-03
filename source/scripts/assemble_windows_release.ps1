@@ -29,6 +29,7 @@ if (Test-Path -LiteralPath $portableZip) {
 New-Item -ItemType Directory -Path $releaseRoot -Force | Out-Null
 Copy-Item -LiteralPath $builtApp -Destination $releaseApp -Recurse -Force
 Copy-Item -LiteralPath $browserRoot -Destination (Join-Path $releaseApp "ms-playwright") -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $sourceRoot "发布版使用说明.txt") -Destination $releaseApp -Force
 Compress-Archive -Path $releaseApp -DestinationPath $portableZip -CompressionLevel Optimal
 
 Write-Output "portable_zip=$portableZip"

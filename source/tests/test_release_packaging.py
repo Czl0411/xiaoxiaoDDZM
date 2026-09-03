@@ -71,3 +71,17 @@ def test_installer_is_per_user_and_never_manages_runtime_data() -> None:
     assert "DZMMBot-Setup-win64" in installer
     assert "[UninstallDelete]" not in installer
     assert "data\\" not in installer.lower()
+
+
+def test_release_docs_explain_both_artifacts_and_private_import_order() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    guide = (SOURCE / "发布版使用说明.txt").read_text(encoding="utf-8")
+    assert "DZMMBot-Portable-win64.zip" in readme
+    assert "DZMMBot-Setup-win64.exe" in readme
+    assert "不包含真实数据或 API Key" in readme
+    assert "关闭机器人" in readme
+    assert "DZMMBot-current-data.zip" in readme
+    assert "关闭机器人" in guide
+    assert "重新登录" in guide
+    assert "自己的 DeepSeek API Key" in guide
+    assert "data" in guide

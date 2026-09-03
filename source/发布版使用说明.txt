@@ -1,0 +1,24 @@
+DZMM 群聊机器人 - Windows 版
+
+便携版
+1. 完整解压 DZMMBot-Portable-win64.zip，不能直接在压缩包内运行。
+2. 双击 DZMM群聊机器人.exe。
+
+安装版
+1. 运行 DZMMBot-Setup-win64.exe。
+2. 默认安装到当前用户目录，不要求管理员权限。
+
+导入当前数据
+1. 完全关闭机器人。
+2. 将私下收到的 DZMMBot-current-data.zip 解压到 EXE 所在目录。
+3. 确认 EXE 旁边存在 data\bot.db 和 data\config.json。
+4. 启动机器人并在 Windows 上重新登录 DZMM。
+5. 在后台填写使用者自己的 DeepSeek API Key。
+
+注意事项
+- 支持 64 位 Windows 10 / Windows 11。
+- 已包含 Playwright Chromium，不需要安装 Python 或 Chrome。
+- 若窗口无法打开，请安装 Microsoft Edge WebView2 Runtime。
+- 升级前先关闭机器人并备份整个 data 文件夹。
+- 不要删除 data；其中保存用户、功德、商品、订单和机器人配置。
+- Windows 可能因程序没有商业代码签名而显示“未知发布者”。
