@@ -58,3 +58,16 @@ def test_packaged_assets_and_image_dependency_are_declared() -> None:
     requirements = (SOURCE / "requirements.txt").read_text(encoding="utf-8")
     assert '("../塔罗牌素材", "塔罗牌素材")' in spec
     assert "Pillow==12.3.0" in requirements
+
+
+def test_installer_is_per_user_and_never_manages_runtime_data() -> None:
+    installer = (ROOT / "installer/DZMMBot.iss").read_text(encoding="utf-8")
+    assert "PrivilegesRequired=lowest" in installer
+    assert r"DefaultDirName={localappdata}\Programs\DZMMBot" in installer
+    assert r'Source: "..\release\DZMM群聊机器人\*"' in installer
+    assert "recursesubdirs" in installer
+    assert "[Icons]" in installer
+    assert "[Run]" in installer
+    assert "DZMMBot-Setup-win64" in installer
+    assert "[UninstallDelete]" not in installer
+    assert "data\\" not in installer.lower()
