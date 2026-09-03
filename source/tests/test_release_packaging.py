@@ -35,6 +35,7 @@ def test_windows_workflow_builds_portable_and_setup_without_secret_injection() -
     workflow = (ROOT / ".github/workflows/build-windows.yml").read_text(encoding="utf-8")
     assert "windows-latest" in workflow
     assert "python-version: '3.12'" in workflow
+    assert "PYTHONPATH: ${{ github.workspace }}\\source" in workflow
     assert "playwright install chromium" in workflow
     assert 'DEEPSEEK_SECRET_BLOB = ""' in workflow
     assert "PyInstaller" in workflow
