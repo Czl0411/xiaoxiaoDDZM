@@ -40,6 +40,7 @@ def test_windows_workflow_builds_portable_and_setup_without_secret_injection() -
     assert 'DEEPSEEK_SECRET_BLOB = ""' in workflow
     assert "PyInstaller" in workflow
     assert "assemble_windows_release.ps1" in workflow
+    assert "powershell -ExecutionPolicy" not in workflow
     assert "DZMMBot-Portable-win64.zip" in workflow
     assert "DZMMBot-Setup-win64.exe" in workflow
     assert "secrets." not in workflow

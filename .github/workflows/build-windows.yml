@@ -52,7 +52,7 @@ jobs:
 
       - name: Assemble portable ZIP
         shell: pwsh
-        run: powershell -ExecutionPolicy Bypass -File source/scripts/assemble_windows_release.ps1 -ProjectRoot "${{ github.workspace }}"
+        run: ./source/scripts/assemble_windows_release.ps1 -ProjectRoot "${{ github.workspace }}"
 
       - name: Install Inno Setup
         shell: pwsh
