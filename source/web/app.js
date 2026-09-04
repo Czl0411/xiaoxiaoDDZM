@@ -3469,6 +3469,15 @@ window.moveRule = async function(id) {
 };
 
 async function init() {
+  const adminSession = await fetch("/api/auth/session");
+  if (adminSession.status === 401) {
+    location.href = "/login";
+    return;
+  }
+  if (adminSession.ok) {
+    const sessionData = await adminSession.json();
+    sessionStorage.setItem("dzmm_csrf", sessionData.csrf_token);
+  }
   api("/api/app/heartbeat", { method: "POST" }).catch(() => {});
   setInterval(() => api("/api/app/heartbeat", { method: "POST" }).catch(() => {}), 2000);
   window.addEventListener("beforeunload", () => {
