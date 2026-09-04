@@ -1,0 +1,21 @@
+[Unit]
+Description=DZMMBot application and web admin
+After=network-online.target dzmmbot-display.service
+Requires=dzmmbot-display.service
+
+[Service]
+Type=simple
+User=dzmmbot
+Group=dzmmbot
+WorkingDirectory=/opt/dzmmbot/current/source
+EnvironmentFile=/etc/dzmmbot/dzmmbot.env
+Environment=DZMM_SERVER_MODE=1
+ExecStart=/opt/dzmmbot/venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 7902
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

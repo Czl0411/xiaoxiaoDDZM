@@ -1,5 +1,10 @@
 ﻿const $ = (id) => document.getElementById(id);
 
+const serverBrowserLink = $("serverBrowserLink");
+if (serverBrowserLink) {
+  serverBrowserLink.href = `${location.protocol}//${location.hostname}:18081/vnc.html?autoconnect=1&resize=scale`;
+}
+
 let config = {};
 var sysCmds = [
   { key: "checkin", name: "签到", tk: "checkin_commands",

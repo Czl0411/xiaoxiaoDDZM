@@ -1,0 +1,18 @@
+[Unit]
+Description=DZMMBot authenticated browser console backend
+After=dzmmbot-display.service
+Requires=dzmmbot-display.service
+
+[Service]
+Type=simple
+User=dzmmbot
+Group=dzmmbot
+ExecStart=/usr/share/novnc/utils/novnc_proxy --listen 127.0.0.1:6080 --vnc 127.0.0.1:5900
+ExecStartPre=/bin/sh -c '/usr/bin/pgrep -f "x11vnc.*:99" || /usr/bin/x11vnc -display :99 -localhost -forever -shared -nopw -bg'
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

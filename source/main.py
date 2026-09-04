@@ -64,6 +64,10 @@ def _resolve_runtime_asset_dir(name: str) -> Path:
     return next((path for path in candidates if path.is_dir()), candidates[0])
 
 
+def manager_shutdown_monitor_enabled() -> bool:
+    return os.environ.get("DZMM_SERVER_MODE") != "1"
+
+
 async def _send_adapter_text_messages(
     adapter,
     db,
@@ -641,7 +645,11 @@ async def lifespan(app: FastAPI):
                 db.close()
                 os._exit(0)
 
-    app.state.shutdown_monitor_task = asyncio.create_task(shutdown_monitor())
+    app.state.shutdown_monitor_task = (
+        asyncio.create_task(shutdown_monitor())
+        if manager_shutdown_monitor_enabled()
+        else None
+    )
 
     await browser.start()
     await image_generation_service.recover_interrupted()
@@ -667,7 +675,8 @@ async def lifespan(app: FastAPI):
     if initial_config.get("ui", {}).get("auto_open_manager", True) and os.environ.get("DZMM_SKIP_AUTO_OPEN") != "1":
         webbrowser.open("http://127.0.0.1:7902")
     yield
-    app.state.shutdown_monitor_task.cancel()
+    if app.state.shutdown_monitor_task:
+        app.state.shutdown_monitor_task.cancel()
     await scheduler.stop()
     await browser.stop()
     db.close()

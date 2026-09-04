@@ -144,6 +144,10 @@ def install_admin_auth(app: FastAPI, auth: AdminAuth, *, cookie_secure: bool = F
         )
         return response
 
+    @app.get("/api/auth/check", status_code=204)
+    async def auth_check():
+        return None
+
     @app.post("/api/auth/logout")
     async def logout(request: Request):
         auth.logout(request.cookies.get("dzmm_admin_session"))

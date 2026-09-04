@@ -1,0 +1,14 @@
+[Unit]
+Description=DZMMBot virtual display
+After=network.target
+
+[Service]
+Type=simple
+User=dzmmbot
+Group=dzmmbot
+ExecStart=/usr/bin/Xvfb :99 -screen 0 1280x900x24 -nolisten tcp
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

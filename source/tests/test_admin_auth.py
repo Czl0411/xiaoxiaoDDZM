@@ -44,6 +44,7 @@ def test_http_admin_login_and_csrf_protection():
     response = client.post("/api/auth/login", json={"username": "admin", "password": "secret"})
     assert response.status_code == 200
     csrf = response.json()["csrf_token"]
+    assert client.get("/api/auth/check").status_code == 204
     assert client.get("/").json() == {"ok": True}
     assert client.post("/api/change").status_code == 403
     assert client.post("/api/change", headers={"X-CSRF-Token": csrf}).json() == {"changed": True}
