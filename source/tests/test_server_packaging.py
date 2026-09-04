@@ -9,6 +9,7 @@ def test_server_deployment_files_are_present_and_safe():
         "deploy/env/dzmmbot.example.env",
         "deploy/scripts/provision.sh",
         "deploy/scripts/deploy.sh",
+        "deploy/scripts/create-release.sh",
         "deploy/systemd/dzmmbot-display.service",
         "deploy/systemd/dzmmbot.service",
         "deploy/systemd/dzmmbot-browser.service",
@@ -37,3 +38,10 @@ def test_server_deployment_files_are_present_and_safe():
     all_text = "\n".join((ROOT / item).read_text() for item in required)
     assert "Czl/LcL" not in all_text
     assert "124.223.175.168" not in all_text
+
+
+def test_server_release_builder_includes_all_runtime_asset_directories():
+    script = (ROOT / "deploy/scripts/create-release.sh").read_text()
+    assert "source" in script
+    assert "塔罗牌素材" in script
+    assert "盲盒小游戏素材" in script
