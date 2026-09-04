@@ -18,6 +18,7 @@ from app.fortune_today import TODAY_FORTUNE_FEATURES
 from app.image_generation import DEFAULT_IMAGE_SETTINGS, ImageGenerationCore
 from app.marketplace import MarketplaceCore
 from app.random_events import RandomEventCore
+from app.referrals import ReferralCore
 
 
 THEFT_SINGLE_DEFENSE_ITEM = "财神的单次防偷券"
@@ -322,6 +323,7 @@ class Database:
         self.marketplace_core = MarketplaceCore(self)
         self.commission_house = CommissionHouseCore(self)
         self.random_event_core = RandomEventCore(self)
+        self.referral_core = ReferralCore(self)
         self.image_generation_core = ImageGenerationCore(self)
 
     def init(self) -> None:
@@ -1528,6 +1530,7 @@ class Database:
         self._migrate_bounty_core()
         self.marketplace_core.init_schema()
         self.commission_house.init_schema()
+        self.referral_core.ensure_schema()
         self._migrate_users_identity_schema()
         self._ensure_total_merit_tracking()
         self._migrate_identity_scoped_business_uniques()
