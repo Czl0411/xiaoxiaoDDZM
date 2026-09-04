@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import re
 import urllib.request
 from collections import deque
 from datetime import UTC, datetime
@@ -337,6 +338,16 @@ class AikdaSocketGateway:
             text = content.get("text")
             if not isinstance(text, str):
                 return None
+        elif content_type == "system":
+            text = content.get("text")
+            if not isinstance(text, str):
+                return None
+            portal_join = re.fullmatch(
+                r"\s*(?P<newcomer>.+?)\s+通过\s+(?P<inviter>.+?)\s+的链接加入了群聊\s*",
+                text,
+            )
+            if portal_join is None:
+                return None
         elif content_type == "image":
             image_url = content.get("url")
             parsed = urlsplit(image_url) if isinstance(image_url, str) else None
@@ -352,7 +363,7 @@ class AikdaSocketGateway:
             text = "[图片]"
         else:
             return None
-        return {
+        normalized = {
             "message_id": message_id,
             "sent_by": sent_by,
             "sent_at": sent_at,
@@ -365,6 +376,15 @@ class AikdaSocketGateway:
             "reference": cls._normalize_reference(content.get("reference")),
             "chatroom_id": room_id,
         }
+        if content_type == "system":
+            normalized.update(
+                {
+                    "event_type": "member_joined_by_invite",
+                    "newcomer_name": portal_join.group("newcomer").strip(),
+                    "inviter_name": portal_join.group("inviter").strip(),
+                }
+            )
+        return normalized
 
     @staticmethod
     def _normalize_reference(reference: Any):

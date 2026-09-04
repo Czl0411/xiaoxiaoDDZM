@@ -269,6 +269,40 @@ def test_routes_valid_messages_and_deduplicates_platform_id():
     asyncio.run(run())
 
 
+def test_normalizes_portal_join_system_message_without_treating_it_as_chat():
+    normalized = AikdaSocketGateway._normalize_message(
+        "11111111-1111-1111-1111-111111111111",
+        {
+            "message_id": "portal-join-1",
+            "sent_by": "system",
+            "sent_at": "2026-09-04T01:19:00Z",
+            "content": {
+                "type": "system",
+                "text": "鸿鸿鸿 通过 紫苑 的链接加入了群聊",
+            },
+        },
+    )
+
+    assert normalized["event_type"] == "member_joined_by_invite"
+    assert normalized["newcomer_name"] == "鸿鸿鸿"
+    assert normalized["inviter_name"] == "紫苑"
+    assert normalized["text"] == "鸿鸿鸿 通过 紫苑 的链接加入了群聊"
+
+
+def test_does_not_classify_ordinary_text_as_portal_join_event():
+    normalized = AikdaSocketGateway._normalize_message(
+        "11111111-1111-1111-1111-111111111111",
+        {
+            "message_id": "ordinary-1",
+            "sent_by": "user-1",
+            "sent_at": "2026-09-04T01:20:00Z",
+            "content": {"type": "text", "text": "我通过 紫苑 的链接加入了群聊"},
+        },
+    )
+
+    assert "event_type" not in normalized
+
+
 def test_message_handler_receives_event_immediately_without_polling_buffer():
     async def run():
         socket = FakeSocket()
