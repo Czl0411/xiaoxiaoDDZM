@@ -630,11 +630,16 @@ let itemEconomy = { settings: {}, items: [], drop_pool: [], offers: [], history:
 const replyModes = { fixed: "固定回复", random: "随机回复", sequence: "顺序回复", multi: "多段回复" };
 
 async function api(url, options = {}) {
+  const csrf = sessionStorage.getItem("dzmm_csrf") || "";
   const res = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(csrf ? { "X-CSRF-Token": csrf } : {}) },
     ...options,
     body: options.body ? JSON.stringify(options.body) : undefined
   });
+  if (res.status === 401) {
+    location.href = "/login";
+    throw new Error("管理登录已失效");
+  }
   if (!res.ok) {
     const raw = await res.text();
     let message = raw;

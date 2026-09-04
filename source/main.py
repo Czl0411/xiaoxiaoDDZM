@@ -22,6 +22,7 @@ from pydantic import BaseModel
 
 from app.ai_interaction import AIInteractionError, DeepSeekClient
 from app.ai_character import AICharacterService, AICharacterStore
+from app.admin_auth import AdminAuth, install_admin_auth
 from app.browser import BrowserController
 from app.command_router import (
     CHURCH_THEME_FEATURES,
@@ -674,6 +675,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="DZMM 网页群聊机器人", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
+
+_admin_username = os.environ.get("DZMM_ADMIN_USERNAME", "").strip()
+_admin_password_hash = os.environ.get("DZMM_ADMIN_PASSWORD_HASH", "").strip()
+if os.environ.get("DZMM_REQUIRE_ADMIN_AUTH") == "1" and not (_admin_username and _admin_password_hash):
+    raise RuntimeError("服务器模式必须设置 DZMM_ADMIN_USERNAME 和 DZMM_ADMIN_PASSWORD_HASH")
+if _admin_username and _admin_password_hash:
+    install_admin_auth(app, AdminAuth(_admin_username, _admin_password_hash))
 
 
 @app.middleware("http")
