@@ -164,10 +164,14 @@ class DzmmAdapter:
     ) -> list[dict[str, Any]]:
         results = []
         for message in messages:
+            is_portal_join = message.get("event_type") == "member_joined_by_invite"
             platform_user_id = str(message.get("sent_by") or "").strip().lower()
             user = self.db.get_user({"platform_user_id": platform_user_id}) if platform_user_id else None
             sender = str((user or {}).get("nickname") or "").strip()
-            if not sender:
+            if is_portal_join:
+                sender = "系统"
+                platform_user_id = ""
+            elif not sender:
                 sender = f"用户-{platform_user_id[:8]}" if platform_user_id else "未知用户"
             reference = message.get("reference") or {}
             sent_at = str(message.get("sent_at") or "")
@@ -205,6 +209,10 @@ class DzmmAdapter:
                     "image_alt": message.get("image_alt"),
                     "image_width": message.get("image_width"),
                     "image_height": message.get("image_height"),
+                    "event_type": message.get("event_type"),
+                    "newcomer_name": message.get("newcomer_name"),
+                    "inviter_name": message.get("inviter_name"),
+                    "sent_at": sent_at,
                 }
             )
         return results

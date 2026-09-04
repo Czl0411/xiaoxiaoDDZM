@@ -172,6 +172,7 @@ DEFAULT_CONFIG = {
         "facility_wage_claim_no_rules_reply": "当前没有启用的工资规则，暂时无法领取。",
         "newcomer_benefit_enabled": True,
         "newcomer_benefit_amount": 60,
+        "referral_reward_amount": 40,
         "profile_reply": "我的昵称：{title}{newline}金币：{balance}{newline}签到天数：{checkins}{newline}我的状态：{statuses}{newline}{contracts}",
         "slave_contract_usage_reply": "公开求主人请直接发送 /发起奴隶契约；定向申请请发送 /发起奴隶契约 对方称呼 金额。",
         "slave_contract_request_reply": "📜 {borrower} 请求向 {lender} 借款 {amount} {currency}。{lender} 请在 10 分钟内发送 /同意。",

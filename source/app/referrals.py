@@ -143,7 +143,7 @@ class ReferralCore:
         newcomer_name = str(newcomer["display_name"] or newcomer["nickname"])
         announcement = (
             f"迷途的羔羊 {newcomer_name} 顺着 {inviter_name} 的传送门来到了大教堂，并成功进行了祈福。\n"
-            f"圣女对 {inviter_name} 好感度 +1，并发放了 {reward}功德 功德奖励。\n"
+            f"圣女对 {inviter_name} 好感度 +1，并发放了 {reward} 功德奖励。\n"
             "提示：主页挂上传送门，方便接引更多迷途的羔羊进来洗礼，为你提供源源不断的功德。"
         )
         return ReferralOutcome(group, newcomer_name, inviter_name, reward, announcement)

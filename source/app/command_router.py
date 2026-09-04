@@ -824,6 +824,19 @@ class CommandRouter:
                 return passive
             return CommandResult(False, [], reason="不是命令")
 
+        referral_reward = re.fullmatch(r"/设置拉新奖励\s+(\d{1,6})", text)
+        if referral_reward:
+            if not self.db.is_admin_user(message):
+                return CommandResult(True, ["该指令仅限管理员使用。"], name="设置拉新奖励", reason="非管理员")
+            amount = int(referral_reward.group(1))
+            if amount > 100000:
+                return CommandResult(True, ["拉新奖励必须在 0 到 100000 功德之间。"], name="设置拉新奖励", reason="数值越界")
+            if not dry_run:
+                config = self.db.get_config()
+                config.setdefault("features", {})["referral_reward_amount"] = amount
+                self.db.save_config(config)
+            return CommandResult(True, [f"传送门拉新奖励已设置为 {amount} 功德。"], name="设置拉新奖励", reason="设置成功")
+
         group_id = self.db._message_group_id(message)
         current_random_event = self.db.random_event_core.get_current_session(group_id)
         if current_random_event:
@@ -5251,6 +5264,7 @@ class CommandRouter:
         reply = self._render(template, title, features.get("currency_name", "金币"), user, {"title": title, "balance": int(user.get("points") or 0), "checkins": int(user.get("total_checkins") or 0), "statuses": status_text, "contracts": contracts})
         if has_contracts and "{contracts}" not in template:
             reply += "\n" + contracts
+        reply += f"\n圣女好感度：{int(user.get('saintess_affection') or 0)}"
         return CommandResult(True, [reply], name="我", reason="查询个人信息")
 
     def _active_statuses_with_debt(self, user: dict[str, Any], features: dict[str, Any]) -> list[dict[str, Any]]:

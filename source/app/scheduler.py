@@ -844,6 +844,10 @@ class BotScheduler:
             message_id = msg["message_id"]
             if message_id in self.seen_message_ids:
                 continue
+            if msg.get("event_type") == "member_joined_by_invite":
+                self.db.referral_core.record_join(msg)
+                self._remember_seen(message_id)
+                continue
             source_key = self._baseline_source_key(msg)
             if source_key and source_key in self.baseline_incomplete_source_keys:
                 self.db.save_message(msg)
@@ -871,6 +875,12 @@ class BotScheduler:
                 self.logger.info(
                     "命令已通过唯一头像UUID安全补回平台用户ID；"
                     f"消息ID={message_id}；昵称={msg.get('sender', '')}"
+                )
+            referral_outcome = self.db.referral_core.observe_message(msg)
+            if referral_outcome is not None:
+                await self._adapter_send_message(
+                    referral_outcome.announcement,
+                    referral_outcome.group_key,
                 )
             if str(msg.get("group_key") or group_key) == "image":
                 if not self.image_generation_service or not self.image_generation_service.is_command(text):

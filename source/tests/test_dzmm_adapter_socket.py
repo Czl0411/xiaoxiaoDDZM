@@ -132,6 +132,26 @@ def test_adapter_reads_socket_messages_with_stable_platform_identity():
     asyncio.run(run())
 
 
+def test_adapter_preserves_portal_join_event_for_scheduler():
+    adapter = DzmmAdapter(FakeBrowser(), FakeDb(), FakeLogger())
+    messages = adapter._normalize_socket_messages(
+        [{
+            "message_id": "join-1", "sent_by": "system",
+            "sent_at": "2026-09-04T01:19:00Z",
+            "text": "鸿鸿鸿 通过 紫苑 的链接加入了群聊",
+            "content_type": "system", "chatroom_id": "room-1",
+            "event_type": "member_joined_by_invite",
+            "newcomer_name": "鸿鸿鸿", "inviter_name": "紫苑",
+        }],
+        "main",
+    )
+    assert messages[0]["sender"] == "系统"
+    assert messages[0]["platform_user_id"] == ""
+    assert messages[0]["event_type"] == "member_joined_by_invite"
+    assert messages[0]["newcomer_name"] == "鸿鸿鸿"
+    assert messages[0]["inviter_name"] == "紫苑"
+
+
 def test_adapter_sends_text_through_socket_and_cleans_up():
     async def run():
         gateway = FakeGateway()
