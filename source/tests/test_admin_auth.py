@@ -38,6 +38,9 @@ def test_http_admin_login_and_csrf_protection():
         return {"changed": True}
 
     client = TestClient(app)
+    login_html = client.get("/login").text
+    assert '<form id="f">' in login_html
+    assert '\n            "<' not in login_html
     assert client.get("/", follow_redirects=False).status_code == 303
     assert client.post("/api/auth/login", json={"username": "admin", "password": "wrong"}).status_code == 401
 

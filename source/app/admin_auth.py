@@ -114,18 +114,18 @@ def install_admin_auth(app: FastAPI, auth: AdminAuth, *, cookie_secure: bool = F
     @app.get("/login", response_class=HTMLResponse)
     async def login_page():
         return HTMLResponse(
-            """<!doctype html><html lang=\"zh-CN\"><meta charset=\"utf-8\">"
+            "<!doctype html><html lang=\"zh-CN\"><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
             "<title>DZMM 管理后台登录</title><style>body{font-family:system-ui;background:#10151c;color:#eee;"
             "display:grid;place-items:center;height:100vh;margin:0}form{display:grid;gap:14px;width:min(360px,80vw);"
             "padding:30px;background:#18212b;border-radius:14px}input,button{font:inherit;padding:12px;border-radius:8px;"
-            "border:1px solid #445}button{cursor:pointer}</style><form id=f><h1>DZMM 管理后台</h1>"
-            "<input name=username autocomplete=username placeholder=\"管理员账号\" required>"
-            "<input name=password type=password autocomplete=current-password placeholder=\"密码\" required>"
-            "<button>登录</button><div id=e></div></form><script>f.onsubmit=async x=>{x.preventDefault();"
+            "border:1px solid #445}button{cursor:pointer}</style><form id=\"f\"><h1>DZMM 管理后台</h1>"
+            "<input name=\"username\" autocomplete=\"username\" placeholder=\"管理员账号\" required>"
+            "<input name=\"password\" type=\"password\" autocomplete=\"current-password\" placeholder=\"密码\" required>"
+            "<button>登录</button><div id=\"e\"></div></form><script>f.onsubmit=async x=>{x.preventDefault();"
             "let r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},"
             "body:JSON.stringify(Object.fromEntries(new FormData(f)))});if(r.ok){let d=await r.json();"
-            "sessionStorage.setItem('dzmm_csrf',d.csrf_token);location='/'}else{e.textContent='账号或密码错误'}}</script></html>"""
+            "sessionStorage.setItem('dzmm_csrf',d.csrf_token);location='/'}else{e.textContent='账号或密码错误'}}</script></html>"
         )
 
     @app.post("/api/auth/login")

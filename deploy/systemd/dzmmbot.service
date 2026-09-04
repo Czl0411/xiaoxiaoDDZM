@@ -10,6 +10,7 @@ Group=dzmmbot
 WorkingDirectory=/opt/dzmmbot/current/source
 EnvironmentFile=/etc/dzmmbot/dzmmbot.env
 Environment=DZMM_SERVER_MODE=1
+Environment=PLAYWRIGHT_BROWSERS_PATH=/opt/dzmmbot/playwright
 ExecStart=/opt/dzmmbot/venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 7902
 Restart=always
 RestartSec=5
