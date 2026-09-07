@@ -192,3 +192,49 @@ def test_text_first_media_never_sends_image_when_text_fails(tmp_path):
     asyncio.run(run())
     assert adapter.sent == ["结算文字"]
     assert adapter.images == []
+
+
+def test_concurrent_game_results_keep_each_text_with_its_image(tmp_path):
+    db = make_db(tmp_path)
+    config = db.get_config()
+    config["dzmm"]["send_delay_seconds"] = 0
+    config["safety"]["global_cooldown_seconds"] = 0
+    config["safety"]["max_replies_per_minute"] = 100
+    config["safety"]["max_replies_per_hour"] = 100
+
+    class OrderedAdapter(_Adapter):
+        def __init__(self):
+            super().__init__()
+            self.events = []
+
+        async def send_message(self, text, group_key="main"):
+            self.events.append(("text", text))
+            await asyncio.sleep(0)
+            return True
+
+        async def send_image(self, path, group_key="main"):
+            self.events.append(("image", path))
+            await asyncio.sleep(0)
+            return True
+
+    adapter = OrderedAdapter()
+    scheduler = BotScheduler(db, adapter, engine=None, logger=_Logger())
+
+    async def run():
+        await asyncio.gather(
+            scheduler._send_replies(
+                message("/1", "round-a"), ["结果A"], "猜乳头", None,
+                config, media_paths=["图片A.webp"], media_first=False,
+            ),
+            scheduler._send_replies(
+                message("/2", "round-b"), ["结果B"], "猜乳头", None,
+                config, media_paths=["图片B.webp"], media_first=False,
+            ),
+        )
+        await asyncio.gather(*list(scheduler.media_send_tasks))
+
+    asyncio.run(run())
+    assert adapter.events in (
+        [("text", "结果A"), ("image", "图片A.webp"), ("text", "结果B"), ("image", "图片B.webp")],
+        [("text", "结果B"), ("image", "图片B.webp"), ("text", "结果A"), ("image", "图片A.webp")],
+    )

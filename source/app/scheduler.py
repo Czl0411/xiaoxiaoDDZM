@@ -46,6 +46,7 @@ class BotScheduler:
         self.auto_resume_at = 0.0
         self.auto_pause_reason = ""
         self.media_send_tasks: set[asyncio.Task] = set()
+        self.media_delivery_locks: dict[str, asyncio.Lock] = {}
         self.last_message_time = ""
         self.primed = False
         self.primed_groups: set[str] = set()
@@ -1061,6 +1062,7 @@ class BotScheduler:
         preserve_parts: bool = False,
         media_refund_inventory_id: int | None = None,
         _execute_media_now: bool = False,
+        _media_lock_held: bool = False,
     ) -> bool:
         rp_passive_reply = matched_name in {
             "RP监控", "RP观众消息", "发布向导", "需求发布草稿", "服务发布草稿"
@@ -1099,6 +1101,28 @@ class BotScheduler:
             )
             self._track_media_task(task)
             return True
+        if media_paths and _execute_media_now and not _media_lock_held:
+            target_group = str(
+                msg.get("group_key") or msg.get("source_group") or "main"
+            )
+            async with self.media_delivery_locks.setdefault(
+                target_group, asyncio.Lock()
+            ):
+                return await self._send_replies(
+                    msg,
+                    replies,
+                    matched_name,
+                    rule_id,
+                    config,
+                    media_paths=media_paths,
+                    media_first=media_first,
+                    deliveries=deliveries,
+                    direct_deliveries=direct_deliveries,
+                    preserve_parts=preserve_parts,
+                    media_refund_inventory_id=media_refund_inventory_id,
+                    _execute_media_now=True,
+                    _media_lock_held=True,
+                )
         # AI and traditional commands share one hard two-page budget.  Keeping
         # caller-provided parts here would let an AI response bypass that cap.
         replies = prepare_outgoing_text_sequence(replies)
