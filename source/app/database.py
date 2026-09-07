@@ -8761,6 +8761,10 @@ class Database:
         ).fetchone()
         if existing:
             existing_dict = dict(existing)
+            old_nickname = existing_dict.get("nickname") or ""
+            old_display_name = existing_dict.get("display_name") or ""
+            placeholder = f"用户-{platform_user_id[:8]}"
+            display_name = nickname if old_display_name in ("", old_nickname, placeholder) else old_display_name
             history = self._append_history(existing_dict.get("nickname_history") or "", existing_dict.get("nickname") or "")
             history = self._append_history(history, nickname)
             self.conn.execute(
@@ -8771,7 +8775,7 @@ class Database:
                     nickname or existing_dict["nickname"],
                     avatar_id or existing_dict.get("avatar_id") or "",
                     platform_user_id,
-                    existing_dict.get("display_name") or nickname,
+                    display_name,
                     history,
                     now,
                     existing_dict["id"],

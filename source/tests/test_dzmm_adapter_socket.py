@@ -132,6 +132,22 @@ def test_adapter_reads_socket_messages_with_stable_platform_identity():
     asyncio.run(run())
 
 
+def test_adapter_uses_socket_profile_name_and_avatar():
+    adapter = DzmmAdapter(FakeBrowser(), FakeDb(), FakeLogger())
+    messages = adapter._normalize_socket_messages(
+        [{
+            "message_id": "message-profile", "sent_by": "new-id",
+            "sent_at": "2026-09-07T01:02:03Z", "text": "你好",
+            "content_type": "text", "chatroom_id": "room",
+            "sender_name": "真实昵称",
+            "avatar_url": "https://cdn.example/avatar/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.png",
+        }],
+        "main",
+    )
+    assert messages[0]["sender"] == "真实昵称"
+    assert messages[0]["avatar_id"] == "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+
+
 def test_adapter_preserves_portal_join_event_for_scheduler():
     adapter = DzmmAdapter(FakeBrowser(), FakeDb(), FakeLogger())
     messages = adapter._normalize_socket_messages(

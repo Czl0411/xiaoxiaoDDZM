@@ -75,6 +75,41 @@ def make_gateway(socket):
     )
 
 
+def test_incoming_message_is_enriched_with_cached_user_profile():
+    async def run():
+        socket = FakeSocket()
+        calls = []
+
+        async def user_profile(user_id, chatroom_id):
+            calls.append((user_id, chatroom_id))
+            return {
+                "fullName": "真实昵称",
+                "avatarUrl": "https://cdn.example/avatar/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.png",
+            }
+
+        gateway = make_gateway(socket)
+        gateway._user_profile_provider = user_profile
+        await gateway.configure_rooms({"main": MAIN_URL})
+        await gateway.maintain()
+        for message_id in ("m1", "m2"):
+            await socket.trigger("message:new", {
+                "chatroomId": "11111111-1111-1111-1111-111111111111",
+                "message": {
+                    "message_id": message_id,
+                    "sent_by": "person-id",
+                    "sent_at": "2026-09-07T01:00:00Z",
+                    "content": {"type": "text", "text": "你好"},
+                },
+            })
+
+        messages = await gateway.read_new("main")
+        assert [item["sender_name"] for item in messages] == ["真实昵称", "真实昵称"]
+        assert messages[0]["avatar_url"].endswith("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.png")
+        assert calls == [("person-id", "11111111-1111-1111-1111-111111111111")]
+
+    asyncio.run(run())
+
+
 def test_default_async_client_uses_operating_system_https_proxy(monkeypatch):
     monkeypatch.delenv("HTTPS_PROXY", raising=False)
     monkeypatch.delenv("https_proxy", raising=False)

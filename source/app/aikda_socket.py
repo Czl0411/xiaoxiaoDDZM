@@ -30,11 +30,14 @@ class AikdaSocketGateway:
         profile_provider: Callable[[], Awaitable[dict[str, Any]]],
         token_provider: Callable[[], Awaitable[str]],
         cookie_provider: Callable[[str], Awaitable[str]],
+        user_profile_provider: Callable[[str, str], Awaitable[dict[str, Any]]] | None = None,
         socket_factory: Callable[[], Any] | None = None,
     ) -> None:
         self._profile_provider = profile_provider
         self._token_provider = token_provider
         self._cookie_provider = cookie_provider
+        self._user_profile_provider = user_profile_provider
+        self._user_profiles: dict[tuple[str, str], dict[str, Any]] = {}
         self._socket_factory = socket_factory or self._new_socket
         self._socket = None
         self._origin = ""
@@ -301,6 +304,27 @@ class AikdaSocketGateway:
         normalized = self._normalize_message(room_id, message)
         if normalized is None or normalized["sent_by"] == self._bot_id:
             return
+        provider = self._user_profile_provider
+        if provider is not None and normalized.get("event_type") is None:
+            profile_key = (room_id, normalized["sent_by"])
+            profile = self._user_profiles.get(profile_key)
+            if profile is None:
+                try:
+                    profile = await provider(normalized["sent_by"], room_id)
+                except Exception:
+                    profile = {}
+                if profile:
+                    self._user_profiles[profile_key] = profile
+            if profile:
+                normalized["sender_name"] = str(
+                    profile.get("fullName") or profile.get("nickname") or profile.get("name") or ""
+                ).strip()
+                normalized["avatar_url"] = str(
+                    profile.get("avatarUrl") or profile.get("avatar_url") or profile.get("avatar") or ""
+                ).strip()
+                normalized["avatar_id"] = str(
+                    profile.get("avatarId") or profile.get("avatar_id") or ""
+                ).strip()
         seen_key = (room_id, normalized["message_id"])
         if seen_key in self._seen:
             return

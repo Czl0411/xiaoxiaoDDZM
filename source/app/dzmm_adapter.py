@@ -167,7 +167,15 @@ class DzmmAdapter:
             is_portal_join = message.get("event_type") == "member_joined_by_invite"
             platform_user_id = str(message.get("sent_by") or "").strip().lower()
             user = self.db.get_user({"platform_user_id": platform_user_id}) if platform_user_id else None
-            sender = str((user or {}).get("nickname") or "").strip()
+            sender = str(message.get("sender_name") or (user or {}).get("nickname") or "").strip()
+            avatar_id = str(message.get("avatar_id") or "").strip().lower()
+            if not avatar_id:
+                avatar_match = re.search(
+                    r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    str(message.get("avatar_url") or ""),
+                    re.IGNORECASE,
+                )
+                avatar_id = avatar_match.group(0).lower() if avatar_match else ""
             if is_portal_join:
                 sender = "系统"
                 platform_user_id = ""
@@ -188,7 +196,7 @@ class DzmmAdapter:
                     "user_id": platform_user_id,
                     "platform_user_id": platform_user_id,
                     "identity_source": "platform",
-                    "avatar_id": "",
+                    "avatar_id": avatar_id,
                     "gender": "unknown",
                     "sender": sender,
                     "text": str(message.get("text") or ""),
@@ -232,6 +240,7 @@ class DzmmAdapter:
                 profile_provider=self.browser.socket_profile,
                 token_provider=self.browser.socket_token,
                 cookie_provider=self.browser.socket_cookie_header,
+                user_profile_provider=getattr(self.browser, "socket_user_profile", None),
             )
             if hasattr(self._gateway, "set_message_handler"):
                 self._gateway.set_message_handler(

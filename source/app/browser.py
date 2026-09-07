@@ -209,6 +209,18 @@ class BrowserController:
             result = (session or {}).get("user")
         return result if isinstance(result, dict) else {}
 
+    async def socket_user_profile(self, user_id: str, chatroom_id: str) -> dict:
+        page = await self.ensure_page()
+        result = await page.evaluate(
+            _TRPC_SCRIPT,
+            {
+                "procedure": "user.getChatroomUser",
+                "payload": {"userId": user_id, "chatroomId": chatroom_id},
+                "timeoutMs": 5000,
+            },
+        )
+        return result if isinstance(result, dict) else {}
+
     async def _stored_auth_session(self) -> dict | None:
         if not self.context:
             return None

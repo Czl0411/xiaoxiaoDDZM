@@ -44,6 +44,21 @@ def test_new_verified_user_uses_platform_id(tmp_path):
     assert user["avatar_id"] == "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
 
 
+def test_profile_enrichment_replaces_generated_placeholder_but_keeps_custom_name(tmp_path):
+    db = make_db(tmp_path)
+    platform_id = "12345678-1111-1111-1111-111111111111"
+    placeholder = db.ensure_user(identity(platform_id, "用户-12345678", ""))
+
+    enriched = db.ensure_user(identity(platform_id, "真实昵称", "avatar-id", "m2"))
+    assert enriched["nickname"] == "真实昵称"
+    assert enriched["display_name"] == "真实昵称"
+
+    db.set_display_name(enriched, "自定义称呼")
+    renamed = db.ensure_user(identity(platform_id, "后来改名", "new-avatar", "m3"))
+    assert renamed["nickname"] == "后来改名"
+    assert renamed["display_name"] == "自定义称呼"
+
+
 def test_platform_id_does_not_adopt_legacy_user_by_nickname_or_avatar(tmp_path):
     db = make_db(tmp_path)
     legacy = db.ensure_user("旧用户")
