@@ -239,10 +239,10 @@ def test_demand_uses_people_and_reopens_slot_after_mutual_cancel(db):
     published = publish(router, SELLER, "需求方", "/需求：找4个人每人在群里喊我一声主人，每人50功德，单次", demand_json(), "demand")
     assert "D0001" in published.replies[0]
     assert db.get_user(SELLER)["points"] == 780
-    accepted = router.handle(message(WORKER, "履约方", "/接取需求D0001", "take"))
+    accepted = router.handle(message(WORKER, "履约方", "/接取需求D0001", "take", "bounty"))
     assert "O0001" in accepted.replies[0]
-    router.handle(message(WORKER, "履约方", "/申请取消订单O0001", "cancel"))
-    router.handle(message(SELLER, "需求方", "/同意取消订单O0001", "approve"))
+    router.handle(message(WORKER, "履约方", "/申请取消订单O0001", "cancel", "bounty"))
+    router.handle(message(SELLER, "需求方", "/同意取消订单O0001", "approve", "bounty"))
     demand = db.commission_house.resolve("D0001", "demand")
     assert demand["required_people"] == 4
     assert demand["accepted_count"] == 0
@@ -255,12 +255,12 @@ def test_service_is_repeatable_product_and_commission_is_seller_deducted(db):
     router = CommandRouter(db, ai_client_factory=FakeAI)
     published = publish(router, SELLER, "卖家", "/服务：我可以喊你一声主人，50功德一次，不限人数，上架3天", service_json(), "service")
     assert "S0001" in published.replies[0]
-    first = router.handle(message(BUYER, "买家", "/购买服务S0001", "buy1"))
-    second = router.handle(message(BUYER, "买家", "/购买服务S0001*3", "buy2"))
+    first = router.handle(message(BUYER, "买家", "/购买服务S0001", "buy1", "bounty"))
+    second = router.handle(message(BUYER, "买家", "/购买服务S0001*3", "buy2", "bounty"))
     assert "O0001" in first.replies[0] and "O0002" in second.replies[0]
     assert db.get_user(BUYER)["points"] == 300
-    router.handle(message(SELLER, "卖家", "/完成订单O0001", "done"))
-    confirmed = router.handle(message(BUYER, "买家", "/确认订单O0001", "confirm"))
+    router.handle(message(SELLER, "卖家", "/完成订单O0001", "done", "bounty"))
+    confirmed = router.handle(message(BUYER, "买家", "/确认订单O0001", "confirm", "bounty"))
     assert "到账 45" in confirmed.replies[0] and "系统回收 5" in confirmed.replies[0]
     assert db.get_user(SELLER)["points"] == 545
     service = db.commission_house.resolve("S0001", "service")
@@ -304,7 +304,7 @@ def test_service_card_separates_stock_limit_and_falls_back_from_numeric_unit(db)
     db.conn.execute("update commission_services set unit_label='3' where id=1")
     db.conn.commit()
 
-    detail = router.handle(message(BUYER, "买家", "/服务详情 S0001", "stable-card-detail"))
+    detail = router.handle(message(BUYER, "买家", "/服务详情 S0001", "stable-card-detail", "bounty"))
 
     assert "价格：50功德/次" in detail.replies[0]
     assert "库存：3/3｜每人限购：1次" in detail.replies[0]
@@ -331,7 +331,7 @@ def test_delete_service_rejects_unfinished_orders(db):
     fund(db, BUYER, "买家", 500)
     router = CommandRouter(db, ai_client_factory=FakeAI)
     publish(router, SELLER, "卖家", "/服务：测试服务", service_json(stock_mode="limited", stock=2), "delete-active")
-    router.handle(message(BUYER, "买家", "/购买服务 S0001", "delete-active-buy"))
+    router.handle(message(BUYER, "买家", "/购买服务 S0001", "delete-active-buy", "bounty"))
     router.handle(message(SELLER, "卖家", "/下架服务 S0001", "delete-active-off"))
 
     rejected = router.handle(message(SELLER, "卖家", "/删除服务 S0001", "delete-active-reject"))
@@ -344,9 +344,9 @@ def test_delete_completed_demand_hides_it_but_preserves_record(db):
     fund(db, WORKER, "履约者", 500)
     router = CommandRouter(db, ai_client_factory=FakeAI)
     publish(router, SELLER, "发布者", "/需求：测试需求", demand_json(people=1, reward=50), "delete-demand")
-    router.handle(message(WORKER, "履约者", "/接取需求 D0001", "delete-demand-take"))
-    router.handle(message(WORKER, "履约者", "/完成订单 O0001", "delete-demand-submit"))
-    router.handle(message(SELLER, "发布者", "/确认订单 O0001", "delete-demand-confirm"))
+    router.handle(message(WORKER, "履约者", "/接取需求 D0001", "delete-demand-take", "bounty"))
+    router.handle(message(WORKER, "履约者", "/完成订单 O0001", "delete-demand-submit", "bounty"))
+    router.handle(message(SELLER, "发布者", "/确认订单 O0001", "delete-demand-confirm", "bounty"))
 
     deleted = router.handle(message(SELLER, "发布者", "/删除需求 D0001", "delete-demand-done"))
     mine = router.handle(message(SELLER, "发布者", "/我的需求", "delete-demand-mine"))
@@ -361,9 +361,9 @@ def test_submitted_order_tells_client_exact_confirm_command_with_space(db):
     fund(db, BUYER, "买家", 500)
     router = CommandRouter(db, ai_client_factory=FakeAI)
     publish(router, SELLER, "卖家", "/服务：测试服务", service_json(stock_mode="limited", stock=1), "confirm-guide")
-    router.handle(message(BUYER, "买家", "/购买服务 S0001", "confirm-guide-buy"))
+    router.handle(message(BUYER, "买家", "/购买服务 S0001", "confirm-guide-buy", "bounty"))
 
-    submitted = router.handle(message(SELLER, "卖家", "/完成订单 O0001", "confirm-guide-submit"))
+    submitted = router.handle(message(SELLER, "卖家", "/完成订单 O0001", "confirm-guide-submit", "bounty"))
     notices = [item["text"] for item in submitted.deliveries + submitted.direct_deliveries]
 
     assert any("请发送：/确认订单 O0001" in text for text in notices)
@@ -456,7 +456,7 @@ def test_custom_commands_flow_into_cards_lists_and_help_while_old_commands_are_r
     assert "/正式发出" in preview.replies[0]
     published = router.handle(message(SELLER, "需求方", "/正式发出", "custom-confirm"))
     assert "/接任务D0001" in published.deliveries[0]["text"]
-    listing = router.handle(message(BUYER, "买家", "/需求板", "custom-list"))
+    listing = router.handle(message(BUYER, "买家", "/需求板", "custom-list", "bounty"))
     assert "/看需求D0001" in listing.replies[0] and "/接任务D0001" in listing.replies[0]
     assert not router.handle(message(BUYER, "买家", "/发布悬赏令 老命令", "old-command")).handled
     assert not router.handle(message(BUYER, "买家", "/市场", "old-market")).handled

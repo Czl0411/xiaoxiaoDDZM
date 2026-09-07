@@ -860,7 +860,40 @@ class CommandRouter:
         commission_match = self._match_commission_command(text, features)
         if commission_match is not None:
             command, arg = commission_match
-            if str(message.get("source_type") or "group") != "direct":
+            private_keys = (
+                "commission_request_publish_commands", "commission_service_publish_commands",
+                "commission_confirm_draft_commands", "commission_cancel_draft_commands",
+                "commission_my_posts_commands", "commission_my_demands_commands", "commission_my_services_commands",
+                "commission_close_request_commands", "commission_close_service_commands",
+                "commission_delete_request_commands", "commission_delete_service_commands",
+                "commission_service_restock_commands", "commission_service_renew_commands",
+                "commission_help_commands",
+            )
+            bounty_keys = (
+                "commission_request_list_commands", "commission_service_list_commands",
+                "commission_request_detail_commands", "commission_service_detail_commands",
+                "commission_request_accept_commands", "commission_service_accept_commands",
+                "commission_my_orders_commands", "commission_order_detail_commands",
+                "commission_order_complete_commands", "commission_order_confirm_commands",
+                "commission_order_cancel_commands", "commission_order_cancel_approve_commands",
+                "commission_order_cancel_reject_commands",
+            )
+            private_commands = set().union(
+                *(self._commands(features, key) for key in private_keys)
+            )
+            bounty_commands = set().union(
+                *(self._commands(features, key) for key in bounty_keys)
+            )
+            source_type = str(message.get("source_type") or "group")
+            source_group = str(message.get("group_key") or message.get("source_group") or "main")
+            if command in bounty_commands and source_group != "bounty":
+                return CommandResult(
+                    True,
+                    ["请前往悬赏群使用该指令"],
+                    name="委托悬赏群引导",
+                    reason="交易指令仅限悬赏群",
+                )
+            if command in private_commands and source_type != "direct":
                 platform_user_id = str(
                     message.get("platform_user_id") or message.get("user_id") or ""
                 )
@@ -872,10 +905,9 @@ class CommandRouter:
                         name="委托私聊引导",
                         reason="尚未建立私聊",
                     )
-                guide_messages = (
-                    f"🏛️ 请在本私聊中重新发送：{text}",
-                    *commission_help_messages(features),
-                )
+                guide_messages = [f"🏛️ 请在本私聊中重新发送：{text}"]
+                if command in self._commands(features, "commission_help_commands"):
+                    guide_messages.extend(commission_help_messages(features))
                 return CommandResult(
                     True,
                     ["圣喻已给你单独指引"],

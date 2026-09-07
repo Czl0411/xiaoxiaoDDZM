@@ -133,25 +133,14 @@ def test_new_publish_commands_replace_old_commands_and_require_private_chat(db):
     assert blocked.handled and "请私聊机器人" in blocked.replies[0]
 
 
-def test_group_commission_command_guides_known_user_in_saved_direct_room(db):
+def test_main_group_transaction_command_guides_user_to_bounty_group(db):
     db.upsert_direct_chat(PUBLISHER, "known-room")
     router = CommandRouter(db, ai_client_factory=FakeAI)
 
     result = router.handle(message(PUBLISHER, "发布者", "/查看服务", "group-guide", "main"))
 
-    assert result.replies == ["圣喻已给你单独指引"]
-    assert all(item["chatroom_id"] == "known-room" for item in result.direct_deliveries)
-    guide = "\n".join(item["text"] for item in result.direct_deliveries)
-    assert "/查看服务" in guide
-    assert "/需求" in guide and "/服务" in guide
-    assert "/确认发布" in guide and "/取消发布" in guide
-    assert "/需求详情" in guide and "/服务详情" in guide
-    assert "/接取需求" in guide and "/购买服务" in guide
-    assert "/我的委托" in guide and "/我的订单" in guide
-    assert "/关闭需求" in guide and "/下架服务" in guide
-    assert "/需求：找1个人" in guide
-    assert "/服务：陪聊一小时" in guide
-    assert "请先发送 /市场帮助 熟悉完整指令" in guide
+    assert result.replies == ["请前往悬赏群使用该指令"]
+    assert result.direct_deliveries == []
 
 
 def test_commission_help_executes_in_direct_chat_and_group_routes_it_to_direct(db):
@@ -167,22 +156,32 @@ def test_commission_help_executes_in_direct_chat_and_group_routes_it_to_direct(d
     assert "/市场帮助" in "\n".join(item["text"] for item in group.direct_deliveries)
 
 
-def test_group_commission_command_without_saved_room_only_requests_private_chat(db):
+def test_main_group_transaction_command_without_saved_room_still_points_to_bounty(db):
     router = CommandRouter(db, ai_client_factory=FakeAI)
 
     result = router.handle(message(BUYER, "买家", "/查看需求", "new-user", "main"))
 
-    assert result.replies == ["请私聊机器人使用该指令"]
+    assert result.replies == ["请前往悬赏群使用该指令"]
     assert result.direct_deliveries == []
 
 
-def test_direct_commission_query_executes_instead_of_returning_group_guidance(db):
+def test_direct_commission_query_guides_to_bounty_group(db):
     router = CommandRouter(db, ai_client_factory=FakeAI)
 
     result = router.handle(message(BUYER, "买家", "/查看服务", "direct-query"))
 
-    assert result.name == "查看服务"
-    assert "群友委托所" in result.replies[0]
+    assert result.name == "委托悬赏群引导"
+    assert result.replies == ["请前往悬赏群使用该指令"]
+
+
+def test_bounty_management_command_routes_back_to_saved_private_room(db):
+    db.upsert_direct_chat(PUBLISHER, "known-room")
+    router = CommandRouter(db, ai_client_factory=FakeAI)
+
+    result = router.handle(message(PUBLISHER, "发布者", "/我的服务", "manage-guide", "bounty"))
+
+    assert result.replies == ["圣喻已给你单独指引"]
+    assert result.direct_deliveries == [{"chatroom_id": "known-room", "text": "🏛️ 请在本私聊中重新发送：/我的服务"}]
 
 
 def test_direct_demand_publish_confirms_privately_and_broadcasts_to_bounty(db):
@@ -255,7 +254,7 @@ def test_purchase_and_accept_broadcast_and_notify_post_owner(db):
     router = CommandRouter(db, ai_client_factory=FakeAI)
     publish(router, PUBLISHER, "发布者", "/服务：单次服务，每份100功德，名额2，上架3天", current_service("服务正文", 2), "notify-service")
 
-    bought = router.handle(message(BUYER, "买家", "/购买服务S0001", "notify-buy"))
+    bought = router.handle(message(BUYER, "买家", "/购买服务S0001", "notify-buy", "bounty"))
 
     assert bought.deliveries == [{"group_key": "bounty", "text": bought.deliveries[0]["text"]}]
     assert "S0001" in bought.deliveries[0]["text"] and "买家" in bought.deliveries[0]["text"]
@@ -265,7 +264,7 @@ def test_purchase_and_accept_broadcast_and_notify_post_owner(db):
     demand_payload = json.loads(current_demand("需求正文"))
     demand_payload["reward_per_person"] = 100
     publish(router, PUBLISHER, "发布者", "/需求：单次需求，每人100功德", json.dumps(demand_payload, ensure_ascii=False), "notify-demand")
-    accepted = router.handle(message(BUYER, "买家", "/接取需求D0001", "notify-accept"))
+    accepted = router.handle(message(BUYER, "买家", "/接取需求D0001", "notify-accept", "bounty"))
     assert "D0001" in accepted.deliveries[0]["text"] and "买家" in accepted.deliveries[0]["text"]
     assert accepted.direct_deliveries[0]["chatroom_id"] == "publisher-room"
     assert "O0002" in accepted.direct_deliveries[0]["text"]
@@ -277,16 +276,16 @@ def test_order_progress_notifies_counterparty_or_falls_back_to_bounty(db):
     db.upsert_direct_chat(BUYER, "buyer-room")
     router = CommandRouter(db, ai_client_factory=FakeAI)
     publish(router, PUBLISHER, "服务者", "/服务：单次服务，每份100功德，名额1，上架3天", current_service("服务正文", 1), "progress-service")
-    router.handle(message(BUYER, "买家", "/购买服务S0001", "progress-buy"))
+    router.handle(message(BUYER, "买家", "/购买服务S0001", "progress-buy", "bounty"))
 
-    submitted = router.handle(message(PUBLISHER, "服务者", "/完成订单O0001", "progress-submit"))
+    submitted = router.handle(message(PUBLISHER, "服务者", "/完成订单O0001", "progress-submit", "bounty"))
     assert submitted.deliveries == []
     assert submitted.direct_deliveries[0]["chatroom_id"] == "buyer-room"
     assert "O0001" in submitted.direct_deliveries[0]["text"] and "确认" in submitted.direct_deliveries[0]["text"]
 
     db.conn.execute("delete from direct_chats where platform_user_id=?", (PUBLISHER.lower(),))
     db.conn.commit()
-    confirmed = router.handle(message(BUYER, "买家", "/确认订单O0001", "progress-confirm"))
+    confirmed = router.handle(message(BUYER, "买家", "/确认订单O0001", "progress-confirm", "bounty"))
     assert confirmed.direct_deliveries == []
     assert confirmed.deliveries[0]["group_key"] == "bounty"
     assert "O0001" in confirmed.deliveries[0]["text"] and "已完成" in confirmed.deliveries[0]["text"]
