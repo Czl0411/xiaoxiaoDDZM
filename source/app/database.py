@@ -1236,6 +1236,15 @@ class Database:
         self.conn.commit()
 
     def _backfill_direct_chats(self) -> None:
+        self.conn.execute(
+            """delete from direct_chats
+               where ('direct:' || chatroom_id) in (
+                 select source_group from messages
+                 where platform_user_id!='' and source_group like 'direct:%'
+                 group by source_group
+                 having count(distinct platform_user_id) > 1
+               )"""
+        )
         existing_users = {
             str(row["platform_user_id"])
             for row in self.conn.execute("select platform_user_id from direct_chats")
@@ -1245,10 +1254,16 @@ class Database:
             for row in self.conn.execute("select chatroom_id from direct_chats")
         }
         rows = self.conn.execute(
-            """select platform_user_id,source_group,created_at
-               from messages
-               where platform_user_id!='' and source_group like 'direct:%'
-               order by created_at desc,rowid desc"""
+            """select m.platform_user_id,m.source_group,m.created_at
+               from messages m
+               join (
+                 select source_group from messages
+                 where platform_user_id!='' and source_group like 'direct:%'
+                 group by source_group
+                 having count(distinct platform_user_id)=1
+               ) valid on valid.source_group=m.source_group
+               where m.platform_user_id!=''
+               order by m.created_at desc,m.rowid desc"""
         ).fetchall()
         for row in rows:
             user_id = str(row["platform_user_id"] or "").strip().lower()

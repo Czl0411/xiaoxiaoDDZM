@@ -43,3 +43,24 @@ def test_startup_recovers_direct_chat_mapping_from_message_history(tmp_path):
     restarted.init()
 
     assert restarted.get_direct_chatroom_id("seller-id") == "seller-room"
+
+
+def test_startup_does_not_treat_multi_user_room_as_direct_chat(tmp_path):
+    path = tmp_path / "bot.db"
+    db = Database(path, allow_legacy_user_creation=True)
+    db.init()
+    for user_id in ("user-a", "user-b"):
+        db.save_message({
+            "message_id": f"message-{user_id}",
+            "platform_user_id": user_id,
+            "sender": user_id,
+            "text": "你好",
+            "source_group": "direct:old-group-room",
+        })
+    db.close()
+
+    restarted = Database(path, allow_legacy_user_creation=True)
+    restarted.init()
+
+    assert restarted.get_direct_chatroom_id("user-a") is None
+    assert restarted.get_direct_chatroom_id("user-b") is None
