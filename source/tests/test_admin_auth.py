@@ -24,6 +24,20 @@ def test_expired_session_is_rejected():
     assert auth.require_session(session.token) is None
 
 
+def test_additional_admin_account_can_login_without_replacing_primary():
+    auth = AdminAuth(
+        "admin",
+        hash_password("primary-password", salt=b"0123456789abcdef"),
+        additional_accounts={
+            "test": hash_password("test-password", salt=b"fedcba9876543210")
+        },
+    )
+
+    assert auth.login("admin", "primary-password").username == "admin"
+    assert auth.login("test", "test-password").username == "test"
+    assert auth.login("test", "primary-password") is None
+
+
 def test_http_admin_login_and_csrf_protection():
     app = FastAPI()
     auth = AdminAuth("admin", hash_password("secret", salt=b"0123456789abcdef"))

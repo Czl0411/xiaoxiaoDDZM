@@ -687,10 +687,26 @@ app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 
 _admin_username = os.environ.get("DZMM_ADMIN_USERNAME", "").strip()
 _admin_password_hash = os.environ.get("DZMM_ADMIN_PASSWORD_HASH", "").strip()
+_extra_admin_username = os.environ.get("DZMM_EXTRA_ADMIN_USERNAME", "").strip()
+_extra_admin_password_hash = os.environ.get("DZMM_EXTRA_ADMIN_PASSWORD_HASH", "").strip()
 if os.environ.get("DZMM_REQUIRE_ADMIN_AUTH") == "1" and not (_admin_username and _admin_password_hash):
     raise RuntimeError("服务器模式必须设置 DZMM_ADMIN_USERNAME 和 DZMM_ADMIN_PASSWORD_HASH")
+if bool(_extra_admin_username) != bool(_extra_admin_password_hash):
+    raise RuntimeError("附加管理员账号和密码哈希必须同时设置")
 if _admin_username and _admin_password_hash:
-    install_admin_auth(app, AdminAuth(_admin_username, _admin_password_hash))
+    extra_accounts = (
+        {_extra_admin_username: _extra_admin_password_hash}
+        if _extra_admin_username
+        else None
+    )
+    install_admin_auth(
+        app,
+        AdminAuth(
+            _admin_username,
+            _admin_password_hash,
+            additional_accounts=extra_accounts,
+        ),
+    )
 
 
 @app.middleware("http")

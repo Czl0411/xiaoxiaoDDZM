@@ -47,19 +47,30 @@ class AdminSession:
 
 
 class AdminAuth:
-    def __init__(self, username: str, password_hash: str, *, session_seconds: int = 8 * 60 * 60):
+    def __init__(
+        self,
+        username: str,
+        password_hash: str,
+        *,
+        session_seconds: int = 8 * 60 * 60,
+        additional_accounts: dict[str, str] | None = None,
+    ):
         self.username = username
         self.password_hash = password_hash
+        self.account_hashes = {username: password_hash, **(additional_accounts or {})}
         self.session_seconds = session_seconds
         self._sessions: dict[str, AdminSession] = {}
 
     def login(self, username: str, password: str) -> AdminSession | None:
-        valid_user = hmac.compare_digest(username, self.username)
-        valid_password = verify_password(password, self.password_hash)
-        if not (valid_user and valid_password):
+        matched_username = next(
+            (name for name in self.account_hashes if hmac.compare_digest(username, name)),
+            None,
+        )
+        password_hash = self.account_hashes.get(matched_username or "", self.password_hash)
+        if matched_username is None or not verify_password(password, password_hash):
             return None
         session = AdminSession(
-            username=self.username,
+            username=matched_username,
             token=secrets.token_urlsafe(32),
             csrf_token=secrets.token_urlsafe(32),
             expires_at=time.time() + self.session_seconds,
