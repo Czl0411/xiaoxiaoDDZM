@@ -1202,6 +1202,7 @@ class Database:
         )
         self.conn.commit()
         self._migrate()
+        self._backfill_direct_chats()
         self._backfill_commission_public_ids()
         self._migrate_legacy_rule_cooldowns()
         self.prune_messages()
@@ -1232,6 +1233,34 @@ class Database:
                  discovered_at=excluded.discovered_at""",
             (user_id, room_id, self.now()),
         )
+        self.conn.commit()
+
+    def _backfill_direct_chats(self) -> None:
+        existing_users = {
+            str(row["platform_user_id"])
+            for row in self.conn.execute("select platform_user_id from direct_chats")
+        }
+        existing_rooms = {
+            str(row["chatroom_id"])
+            for row in self.conn.execute("select chatroom_id from direct_chats")
+        }
+        rows = self.conn.execute(
+            """select platform_user_id,source_group,created_at
+               from messages
+               where platform_user_id!='' and source_group like 'direct:%'
+               order by created_at desc,rowid desc"""
+        ).fetchall()
+        for row in rows:
+            user_id = str(row["platform_user_id"] or "").strip().lower()
+            room_id = str(row["source_group"] or "")[7:].strip().lower()
+            if not user_id or not room_id or user_id in existing_users or room_id in existing_rooms:
+                continue
+            self.conn.execute(
+                "insert into direct_chats(platform_user_id,chatroom_id,discovered_at) values(?,?,?)",
+                (user_id, room_id, str(row["created_at"] or self.now())),
+            )
+            existing_users.add(user_id)
+            existing_rooms.add(room_id)
         self.conn.commit()
 
     def get_direct_chatroom_id(self, platform_user_id: str) -> str | None:
